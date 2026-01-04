@@ -1,0 +1,104 @@
+:root {
+    --navy: #0e2245;
+    --light-gray: #f2f4f7;
+    --border-gray: #e0e0e0;
+    --remark-bg: #fff9c4;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.report-card {
+    width: 1000px;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+/* Header Section */
+.header-banner {
+    background-color: var(--navy);
+    color: white;
+    padding: 30px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-banner h1 {
+    margin: 0;
+    font-style: italic;
+    font-size: 28px;
+    letter-spacing: 1px;
+}
+
+.contact-info {
+    text-align: right;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* Student Info Grid */
+.info-section {
+    background-color: var(--light-gray);
+    padding: 25px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    font-size: 15px;
+}
+
+.info-item b {
+    display: inline-block;
+    width: 130px;
+    color: #333;
+}
+
+/* Table Design */
+.marks-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.marks-table th {
+    background-color: var(--navy);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.marks-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-gray);
+    font-size: 14px;
+}
+
+.remark-tag {
+    background: var(--remark-bg);
+    padding: 4px 12px;
+    border-radius: 4px;
+    color: #856404;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.search-bar {
+    padding: 20px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+.search-bar input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 250px;
+}

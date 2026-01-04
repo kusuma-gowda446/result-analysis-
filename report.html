@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Progress Report</title>
+    <style>
+        :root {
+            --navy: #0e2245;
+            --light-bg: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #e9ecef;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .report-card {
+            max-width: 950px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .header {
+            background: var(--navy);
+            color: white;
+            padding: 30px 40px;
+        }
+        .header h1 {
+            margin: 0;
+            font-style: italic;
+            font-size: 26px;
+            letter-spacing: 1px;
+        }
+        .header p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+        }
+        .student-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 25px 40px;
+            background: var(--light-bg);
+            border-bottom: 2px solid var(--navy);
+            gap: 15px;
+        }
+        .meta-item b {
+            width: 150px;
+            display: inline-block;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #333;
+        }
+        .remark-tag {
+            background: #fff9c4;
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: #856404;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .grand-total {
+            background: #eee;
+            font-weight: bold;
+        }
+        .actions {
+            padding: 30px;
+            text-align: center;
+            background: var(--light-bg);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .btn-download {
+            background: var(--navy);
+            color: white;
+        }
+        .btn-back {
+            color: #666;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-card">
+        <div class="header">
+            <h1>Shridevi Institute of Engineering and Technology</h1>
+            <p>Internal Assessment Progress Report</p>
+        </div>
+
+        <div class="student-meta">
+            <div class="meta-item"><b>Name of Student:</b> {{ student.name }}</div>
+            <div class="meta-item"><b>Semester:</b> {{ student.semester }}</div>
+            <div class="meta-item"><b>USN:</b> {{ student.usn }}</div>
+            <div class="meta-item"><b>Academic Year:</b> {{ student.year }}</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject Description</th>
+                    <th>Score</th>
+                    <th>Attendance</th>
+                    <th>Remark</th>
+                    <th>Max Marks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in student.subjects %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.score }}</td>
+                    <td>{{ s.attendance }}</td>
+                    <td><span class="remark-tag">{{ s.remark }}</span></td>
+                    <td>{{ s.max }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="grand-total">
+                    <td style="text-align: right;">GRAND TOTAL:</td>
+                    <td>{{ student.total }}</td>
+                    <td colspan="2">Out of {{ student.max_total }}</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="actions">
+            <a href="/" class="btn btn-back">← Search Another</a>
+            <a href="/download_pdf" class="btn btn-download">Download PDF Report</a>
+        </div>
+    </div>
+
+</body>
+</html>
