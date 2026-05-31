@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal — Shridevi Institute of Engineering and Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Open Sans', 'Segoe UI', sans-serif;
+            background: #dce3ec;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top Bar (Govt/College style) ── */
+        .top-bar {
+            background: #0e2245;
+            color: rgba(255,255,255,0.85);
+            text-align: center;
+            font-size: 12px;
+            padding: 5px 20px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Official Letterhead ── */
+        .letterhead {
+            background: white;
+            border-bottom: 4px solid #0e2245;
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .seal {
+            width: 80px; height: 80px;
+            border: 3px solid #0e2245;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            font-weight: bold;
+            color: #0e2245;
+            text-align: center;
+            line-height: 1.4;
+            padding: 8px;
+            flex-shrink: 0;
+        }
+        .seal .star { font-size: 15px; }
+
+        .college-info { text-align: center; }
+        .college-info .affil {
+            font-size: 11.5px;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 4px;
+        }
+        .college-info h1 {
+            font-family: 'Merriweather', 'Times New Roman', serif;
+            font-size: 22px;
+            color: #0e2245;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+        .college-info .address {
+            font-size: 11.5px;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .naac-box {
+            width: 76px; height: 76px;
+            border: 3px solid #0e2245;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 7.5px;
+            font-weight: bold;
+            color: #0e2245;
+            line-height: 1.5;
+            flex-shrink: 0;
+        }
+        .naac-box .grade { font-size: 20px; font-weight: 900; line-height: 1; }
+
+        /* ── Nav strip ── */
+        .nav-strip {
+            background: #1a3a6d;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            padding: 0 20px;
+        }
+        .nav-strip a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 12.5px;
+            padding: 9px 20px;
+            display: inline-block;
+            border-bottom: 3px solid transparent;
+            transition: border-color 0.2s, color 0.2s;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .nav-strip a:hover,
+        .nav-strip a.active {
+            border-bottom-color: #f0c040;
+            color: white;
+        }
+
+        /* ── Main Content ── */
+        .page-content {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px 60px;
+            gap: 30px;
+        }
+
+        /* ── Info Panel (left) ── */
+        .info-panel {
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid #cdd4df;
+            border-top: 4px solid #0e2245;
+            border-radius: 2px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .info-card-header {
+            background: #f2f5f9;
+            border-bottom: 1px solid #cdd4df;
+            padding: 9px 16px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #0e2245;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-card-body { padding: 14px 16px; }
+        .info-card-body p {
+            font-size: 13px;
+            color: #444;
+            line-height: 1.75;
+        }
+        .info-card-body ul {
+            padding-left: 18px;
+            font-size: 13px;
+            color: #444;
+            line-height: 2;
+        }
+
+        .notice-bar {
+            background: #fff8e1;
+            border: 1px solid #f0c040;
+            border-left: 4px solid #e6a800;
+            border-radius: 2px;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            color: #5a3e00;
+            line-height: 1.6;
+        }
+        .notice-bar strong { color: #c07800; }
+
+        /* ── Login Box (right) ── */
+        .login-box {
+            width: 380px;
+            flex-shrink: 0;
+        }
+
+        .login-card {
+            background: white;
+            border: 1px solid #cdd4df;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .login-card-header {
+            background: #0e2245;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .login-card-header .lock-icon {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .login-card-header h2 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .login-card-header p {
+            font-size: 11.5px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .login-card-body { padding: 24px; }
+
+        /* Flash Messages */
+        .flash-messages { margin-bottom: 16px; }
+        .flash {
+            padding: 10px 14px;
+            border-radius: 2px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            border-left: 4px solid;
+        }
+        .flash.danger  { background: #fff0f0; border-color: #c0392b; color: #922b21; }
+        .flash.warning { background: #fffde7; border-color: #f39c12; color: #7d6608; }
+        .flash.success { background: #f0fff4; border-color: #27ae60; color: #1e8449; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #1a3a6d;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #b0bacb;
+            border-radius: 2px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #222;
+            background: #fafbfc;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #0e2245;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(14,34,69,0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #0e2245;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: background 0.2s;
+            margin-top: 6px;
+        }
+        .btn-login:hover { background: #1a3a6d; }
+        .btn-login:active { background: #0a1a35; }
+
+        .login-footer {
+            background: #f2f5f9;
+            border-top: 1px solid #cdd4df;
+            padding: 12px 24px;
+            font-size: 11.5px;
+            color: #666;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* ── Page Footer ── */
+        footer {
+            background: #0e2245;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            font-size: 11.5px;
+            padding: 14px 20px;
+            line-height: 1.8;
+        }
+        footer span { color: rgba(255,255,255,0.45); }
+
+        @media (max-width: 780px) {
+            .page-content { flex-direction: column; align-items: center; }
+            .info-panel, .login-box { width: 100%; max-width: 480px; }
+            .letterhead { flex-direction: column; text-align: center; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    Affiliated to Visvesvaraya Technological University (VTU), Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A+
+</div>
+
+<!-- Official Letterhead -->
+<div class="letterhead">
+    <div class="seal">
+        <span class="star">✦</span>
+        SHRIDEVI<br>INSTITUTE<br>EST. 1999<br>✦
+    </div>
+    <div class="college-info">
+        <div class="affil">Affiliated to Visvesvaraya Technological University (VTU), Belagavi</div>
+        <h1>Shridevi Institute of Engineering and Technology</h1>
+        <div class="address">
+            Sira Road, Tumakuru – 572 106, Karnataka &nbsp;|&nbsp; ☎ 0816-225800 &nbsp;|&nbsp; ✉ info@shrideviiet.ac.in
+        </div>
+    </div>
+    <div class="naac-box">
+        NAAC<br>ACCREDITED
+        <span class="grade">A+</span>
+        GRADE
+    </div>
+</div>
+
+<!-- Navigation Strip -->
+<div class="nav-strip">
+    <a href="#" class="active">Student Portal</a>
+    <a href="#">About</a>
+    <a href="#">Departments</a>
+    <a href="#">Academics</a>
+    <a href="#">Contact</a>
+</div>
+
+<!-- Main Content -->
+<div class="page-content">
+
+    <!-- Left Info Panel -->
+    <div class="info-panel">
+
+        <div class="notice-bar">
+            <strong>📢 Notice:</strong> Internal Assessment marks for Semester 3 (2024–25) are now available. Login with your credentials to view your progress report.
+        </div>
+
+        <br>
+
+        <div class="info-card">
+            <div class="info-card-header">About This Portal</div>
+            <div class="info-card-body">
+                <p>The Shridevi Institute Student Portal provides access to Internal Assessment marks, attendance records, and progress reports for students of all departments.</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-header">Instructions</div>
+            <div class="info-card-body">
+                <ul>
+                    <li>Enter your login credentials</li>
+                    <li>Search by USN to view report</li>
+                    <li>Download report as PDF</li>
+                    <li>Contact your class teacher for issues</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-header">Contact</div>
+            <div class="info-card-body">
+                <p>
+                    📍 Sira Road, Tumakuru – 572 106<br>
+                    ☎ 0816-225800<br>
+                    ✉ info@shrideviiet.ac.in<br>
+                    🌐 www.shrideviiet.ac.in
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-box">
+        <div class="login-card">
+            <div class="login-card-header">
+                <div class="lock-icon">🔒</div>
+                <div>
+                    <h2>User Login</h2>
+                    <p>Internal Assessment Portal — 2024–25</p>
+                </div>
+            </div>
+
+            <div class="login-card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for cat, msg in messages %}
+                    <div class="flash {{ cat }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/login" id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username"
+                               placeholder="Enter your username" required
+                               autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password"
+                               placeholder="Enter your password" required
+                               autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-login" id="login-btn">
+                        Sign In →
+                    </button>
+                </form>
+            </div>
+
+            <div class="login-footer">
+                For login issues, contact your Department or the Examination Cell.<br>
+                Dept. of AI &amp; Data Science &nbsp;|&nbsp; Academic Year 2024–25
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+    © 2024–25 Shridevi Institute of Engineering and Technology, Tumakuru<br>
+    <span>Affiliated to VTU, Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A+</span>
+</footer>
+
+</body>
+</html>

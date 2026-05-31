@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Shridevi Institute</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* ── Top Nav ── */
+        nav {
+            background: #0e2245;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .nav-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.3px;
+        }
+        .nav-brand span { color: #70a6e8; }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .nav-user {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+        .nav-user strong { color: white; }
+        .nav-links { display: flex; gap: 8px; }
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 7px 14px;
+            border-radius: 7px;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.12); color: white; }
+        .nav-link.admin { background: rgba(53,132,228,0.25); color: #70a6e8; }
+        .nav-link.logout { background: rgba(224,36,36,0.2); color: #ff8080; }
+
+        /* ── Main Content ── */
+        main { max-width: 820px; margin: 60px auto; padding: 0 20px; }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-title h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0e2245;
+        }
+        .page-title p {
+            color: #6c757d;
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        /* Flash Messages */
+        .flash-messages { margin-bottom: 24px; }
+        .flash {
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .flash.danger  { background: #fde8e8; border: 1px solid #fca5a5; color: #b91c1c; }
+        .flash.warning { background: #fef9c3; border: 1px solid #fde047; color: #854d0e; }
+        .flash.success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+
+        /* ── Search Card ── */
+        .search-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .search-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        .search-icon svg { width: 28px; height: 28px; fill: #1a5fb4; }
+        .search-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0e2245;
+            margin-bottom: 6px;
+        }
+        .search-card p {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .search-input {
+            flex: 1;
+            padding: 13px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #1f2937;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .search-input:focus { border-color: #3584e4; }
+        .search-input::placeholder { color: #9ca3af; }
+
+        .btn-search {
+            padding: 13px 26px;
+            background: linear-gradient(135deg, #3584e4, #1a5fb4);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(53,132,228,0.35);
+        }
+        .btn-search:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(53,132,228,0.45);
+        }
+
+        /* ── Admin Action Cards ── */
+        .admin-section { margin-top: 24px; }
+        .admin-section h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 14px;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px 24px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #f3f4f6;
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .action-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .action-icon svg { width: 22px; height: 22px; }
+        .icon-green { background: #dcfce7; }
+        .icon-green svg { fill: #15803d; }
+        .icon-blue  { background: #dbeafe; }
+        .icon-blue svg  { fill: #1a5fb4; }
+        .icon-purple { background: #ede9fe; }
+        .icon-purple svg { fill: #7c3aed; }
+
+        .action-text .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .action-text .sub {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-brand">Shridevi Institute <span>· Portal</span></div>
+    <div class="nav-right">
+        <div class="nav-user">Logged in as <strong>{{ username }}</strong>
+            {% if role == 'admin' %} <span style="color:#70a6e8;">(Admin)</span>{% endif %}
+        </div>
+        <div class="nav-links">
+            {% if role == 'admin' %}
+            <a href="/admin/students" class="nav-link admin" id="nav-all-students">All Students</a>
+            {% endif %}
+            <a href="/logout" class="nav-link logout" id="nav-logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="page-title">
+        <h2>Student Result Dashboard</h2>
+        <p>Search for any student by their USN to view their internal assessment report.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="search-card">
+        <div class="search-icon">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </div>
+        <h3>Search Student Report</h3>
+        <p>Enter the student's University Serial Number (USN) below</p>
+        <form method="POST" action="/search" id="search-form">
+            <div class="search-row">
+                <input class="search-input" type="text" name="usn" id="usn-input"
+                       placeholder="e.g. 1SV24AD024" required
+                       autocomplete="off" style="text-transform:uppercase;">
+                <button class="btn-search" type="submit" id="search-btn">View Report</button>
+            </div>
+        </form>
+    </div>
+
+    {% if role == 'admin' %}
+    <div class="admin-section">
+        <h4>Admin Actions</h4>
+        <div class="admin-grid">
+            <a href="/admin/add_student" class="action-card" id="link-add-student">
+                <div class="action-icon icon-green">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                </div>
+                <div class="action-text">
+                    <div class="title">Add Student</div>
+                    <div class="sub">Enter new student marks</div>
+                </div>
+            </a>
+            <a href="/admin/students" class="action-card" id="link-all-students">
+                <div class="action-icon icon-blue">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div class="action-text">
+                    <div class="title">All Students</div>
+                    <div class="sub">View &amp; edit all records</div>
+                </div>
+            </a>
+            <a href="/admin/subjects" class="action-card" id="link-subjects">
+                <div class="action-icon" style="background:#fce7f3;">
+                    <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:#9d174d;"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm1 14h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </div>
+                <div class="action-text">
+                    <div class="title">Manage Subjects</div>
+                    <div class="sub">Add, edit or remove subjects</div>
+                </div>
+            </a>
+            <a href="/admin/add_user" class="action-card" id="link-add-user">
+                <div class="action-icon icon-purple">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                </div>
+                <div class="action-text">
+                    <div class="title">Manage Users</div>
+                    <div class="sub">Add login accounts</div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+</body>
+</html>

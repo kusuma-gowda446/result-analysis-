@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Edit' if student else 'Add' }} Student — Shridevi Institute</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+        nav {
+            background: #0e2245; padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .nav-brand { color: white; font-weight: 700; font-size: 17px; }
+        .nav-brand span { color: #70a6e8; }
+        .nav-link {
+            color: rgba(255,255,255,0.75); text-decoration: none;
+            font-size: 13px; padding: 7px 14px; border-radius: 7px; transition: background 0.2s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.12); color: white; }
+
+        main { max-width: 860px; margin: 40px auto; padding: 0 20px 60px; }
+
+        .page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+        .page-header h2 { font-size: 24px; font-weight: 700; color: #0e2245; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-edit { background: #fef9c3; color: #854d0e; }
+        .badge-add  { background: #dcfce7; color: #15803d; }
+
+        .flash-messages { margin-bottom: 20px; }
+        .flash { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 8px; }
+        .flash.danger  { background:#fde8e8; border:1px solid #fca5a5; color:#b91c1c; }
+        .flash.success { background:#dcfce7; border:1px solid #86efac; color:#15803d; }
+
+        .form-card { background: white; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden; }
+
+        .section-header {
+            background: #0e2245; color: white;
+            padding: 16px 28px; font-size: 13px; font-weight: 600;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-header .dot { width: 8px; height: 8px; background: #70a6e8; border-radius: 50%; }
+
+        .section-body { padding: 26px 28px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .form-group { margin-bottom: 18px; }
+
+        label {
+            display: block; font-size: 12px; font-weight: 600; color: #374151;
+            text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid #e5e7eb; border-radius: 9px;
+            font-size: 14px; font-family: inherit; color: #1f2937;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none; background: #fafafa;
+        }
+        input:focus, select:focus {
+            border-color: #3584e4; box-shadow: 0 0 0 3px rgba(53,132,228,0.12); background: white;
+        }
+        input[readonly] { background: #f3f4f6; color: #6c757d; cursor: not-allowed; }
+
+        /* Subject rows */
+        .subject-block { border: 1.5px solid #f3f4f6; border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
+        .subject-title {
+            background: #f8fafc; padding: 11px 18px;
+            font-size: 13px; font-weight: 600; color: #0e2245;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .subject-title .num {
+            background: #0e2245; color: white;
+            width: 22px; height: 22px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center; font-size: 11px;
+        }
+        .subject-title .max-tag {
+            margin-left: auto; background: #dbeafe; color: #1a5fb4;
+            font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+        }
+        .subject-fields {
+            padding: 16px 18px;
+            display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 14px;
+        }
+        .field-group { margin: 0; }
+
+        .no-subjects {
+            text-align: center; padding: 40px; color: #9ca3af;
+            background: #f8fafc; border-radius: 12px; border: 2px dashed #e5e7eb;
+        }
+        .no-subjects a { color: #3584e4; text-decoration: none; font-weight: 600; }
+
+        .form-footer {
+            background: #f8fafc; padding: 20px 28px;
+            display: flex; justify-content: flex-end; gap: 12px;
+            border-top: 1px solid #f3f4f6;
+        }
+        .btn {
+            padding: 12px 26px; border-radius: 10px; font-size: 14px; font-weight: 600;
+            font-family: inherit; cursor: pointer; border: none; text-decoration: none;
+            display: inline-block; transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3584e4, #1a5fb4);
+            color: white; box-shadow: 0 4px 14px rgba(53,132,228,0.35);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(53,132,228,0.45); }
+        .btn-secondary { background: #f3f4f6; color: #374151; }
+        .btn-secondary:hover { background: #e5e7eb; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-brand">Shridevi Institute <span>· Admin</span></div>
+    <div style="display:flex; gap:8px;">
+        <a href="/admin/subjects"  class="nav-link">Manage Subjects</a>
+        <a href="/admin/students"  class="nav-link">All Students</a>
+        <a href="/dashboard"       class="nav-link">Dashboard</a>
+        <a href="/logout"          class="nav-link" style="color:#ff8080;">Logout</a>
+    </div>
+</nav>
+
+<main>
+    <div class="page-header">
+        <h2>{{ 'Edit Student Record' if student else 'Add New Student' }}</h2>
+        <span class="badge {{ 'badge-edit' if student else 'badge-add' }}">
+            {{ 'Editing' if student else 'New Record' }}
+        </span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" id="student-form">
+        <div class="form-card">
+
+            <!-- ── Student Info ── -->
+            <div class="section-header"><span class="dot"></span> Student Information</div>
+            <div class="section-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="s-usn">USN (University Serial Number)</label>
+                        <input type="text" id="s-usn" name="usn"
+                               value="{{ student.usn if student else '' }}"
+                               placeholder="e.g. 1SV24AD024"
+                               {% if student %}readonly{% else %}required{% endif %}
+                               style="text-transform:uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label for="s-name">Student Full Name</label>
+                        <input type="text" id="s-name" name="name"
+                               value="{{ student.name if student else '' }}"
+                               placeholder="e.g. Kusuma Gowda" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="s-sem">Semester</label>
+                        <input type="text" id="s-sem" name="semester"
+                               value="{{ student.semester if student else '3' }}"
+                               placeholder="e.g. 3">
+                    </div>
+                    <div class="form-group">
+                        <label for="s-year">Academic Year</label>
+                        <input type="text" id="s-year" name="year"
+                               value="{{ student.year if student else '2024-25' }}"
+                               placeholder="e.g. 2024-25">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Subject Marks ── -->
+            <div class="section-header"><span class="dot"></span> Subject Marks &amp; Attendance</div>
+            <div class="section-body">
+                {% if subjects %}
+                    {% for sub in subjects %}
+                    {% set mark = existing_marks.get(sub.id, {}) %}
+                    <div class="subject-block">
+                        <div class="subject-title">
+                            <span class="num">{{ loop.index }}</span>
+                            {{ sub.name }}
+                            <span class="max-tag">Max: {{ sub.max_marks | int }}</span>
+                        </div>
+                        <div class="subject-fields">
+                            <div class="field-group">
+                                <label>Score (Max {{ sub.max_marks | int }})</label>
+                                <input type="number"
+                                       name="score_{{ sub.id }}"
+                                       id="score-{{ sub.id }}"
+                                       min="0" max="{{ sub.max_marks }}" step="0.5"
+                                       value="{{ mark.score if mark else '' }}"
+                                       placeholder="0–{{ sub.max_marks | int }}">
+                            </div>
+                            <div class="field-group">
+                                <label>Attendance</label>
+                                <input type="text"
+                                       name="att_{{ sub.id }}"
+                                       id="att-{{ sub.id }}"
+                                       value="{{ mark.attendance if mark else '' }}"
+                                       placeholder="e.g. 85%">
+                            </div>
+                            <div class="field-group">
+                                <label>Remark</label>
+                                <input type="text"
+                                       name="remark_{{ sub.id }}"
+                                       id="remark-{{ sub.id }}"
+                                       value="{{ mark.remark if mark else '' }}"
+                                       placeholder="e.g. Satisfactory">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-subjects">
+                        No subjects configured yet.
+                        <a href="/admin/subjects">Go to Manage Subjects</a> to add them first.
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- ── Footer ── -->
+            <div class="form-footer">
+                <a href="/admin/students" class="btn btn-secondary" id="btn-cancel">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="btn-save">
+                    {{ '💾 Update Record' if student else '✅ Save Student' }}
+                </button>
+            </div>
+
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

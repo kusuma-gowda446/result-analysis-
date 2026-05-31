@@ -1,0 +1,25 @@
+# Database (contains sensitive login/student data - don't push to GitHub)
+database.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Flask session files
+flask_session/
+
+# Environment
+.env
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

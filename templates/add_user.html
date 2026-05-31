@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Login User — Shridevi Institute</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        nav {
+            background: #0e2245;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .nav-brand { color: white; font-weight: 700; font-size: 17px; }
+        .nav-brand span { color: #70a6e8; }
+        .nav-link {
+            color: rgba(255,255,255,0.75); text-decoration: none;
+            font-size: 13px; padding: 7px 14px; border-radius: 7px;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.12); color: white; }
+
+        main {
+            max-width: 480px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        h2 { font-size: 22px; font-weight: 700; color: #0e2245; margin-bottom: 24px; }
+
+        .flash-messages { margin-bottom: 20px; }
+        .flash { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 8px; }
+        .flash.danger  { background: #fde8e8; border: 1px solid #fca5a5; color: #b91c1c; }
+        .flash.success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 36px 34px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: #374151; text-transform: uppercase;
+            letter-spacing: 0.6px; margin-bottom: 7px;
+        }
+        input[type="text"], input[type="password"], select {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid #e5e7eb; border-radius: 9px;
+            font-size: 14px; font-family: inherit; color: #1f2937;
+            transition: border-color 0.2s; outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #3584e4;
+            box-shadow: 0 0 0 3px rgba(53,132,228,0.12);
+        }
+
+        .btn-submit {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #3584e4, #1a5fb4);
+            color: white; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 600; font-family: inherit;
+            cursor: pointer; margin-top: 6px;
+            box-shadow: 0 4px 14px rgba(53,132,228,0.35);
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(53,132,228,0.45); }
+
+        .hint { font-size: 12px; color: #9ca3af; margin-top: 5px; }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-brand">Shridevi Institute <span>· Admin</span></div>
+    <div style="display:flex; gap:8px;">
+        <a href="/admin/students" class="nav-link">All Students</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/logout" class="nav-link" style="color:#ff8080;">Logout</a>
+    </div>
+</nav>
+
+<main>
+    <h2>Add Login User</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-card">
+        <form method="POST" action="/admin/add_user" id="add-user-form">
+            <div class="form-group">
+                <label for="u-username">Username</label>
+                <input type="text" id="u-username" name="username" placeholder="e.g. john_teacher" required>
+            </div>
+            <div class="form-group">
+                <label for="u-password">Password</label>
+                <input type="password" id="u-password" name="password" placeholder="Choose a strong password" required>
+                <p class="hint">Minimum 6 characters recommended.</p>
+            </div>
+            <div class="form-group">
+                <label for="u-role">Role</label>
+                <select id="u-role" name="role">
+                    <option value="student">Student (search only)</option>
+                    <option value="admin">Admin (full access)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-submit" id="btn-create-user">Create User</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shridevi Institute - Student Portal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-container h1 {
+            color: #0e2245;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #0e2245;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1a3a6d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Student Portal</h1>
+        <p>Enter your details to view the report</p>
+        
+        <form action="/view_report" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Upload CSV Database</label>
+                <input type="file" name="csv_file" accept=".csv" required>
+            </div>
+            <div class="form-group">
+                <label>Student USN</label>
+                <input type="text" name="usn" placeholder="e.g. 1SV24AD024" required>
+            </div>
+            <button type="submit">View Progress Report</button>
+        </form>
+    </div>
+
+</body>
+</html>
