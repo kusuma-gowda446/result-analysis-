@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found (404) — SIET Tumakuru{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center py-5">
+    <div class="col-12 col-md-8 col-lg-6 text-center">
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-sm-5">
+            <div class="mb-3">
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill font-monospace fs-6">HTTP 404 ERROR</span>
+            </div>
+            <h1 class="display-1 fw-bold text-primary mb-2 font-monospace">404</h1>
+            <h3 class="fw-bold text-body mb-3">Page or Record Not Found</h3>
+            <p class="text-muted mb-4">
+                The requested URL or academic record could not be located on the SIET Result Portal server.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('auth.index') }}" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="bi bi-house-door-fill me-2"></i> Return to Portal
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -47,8 +47,36 @@ def validate_score(score, max_marks):
         val = float(score)
         if val < 0:
             return False, 0.0, "Score cannot be negative."
-        if val > max_marks:
-            return False, max_marks, f"Score cannot exceed maximum marks ({max_marks})."
+        if val > float(max_marks):
+            return False, float(max_marks), f"Score cannot exceed maximum marks ({max_marks})."
         return True, val, None
     except (ValueError, TypeError):
         return False, 0.0, "Score must be a valid number."
+
+def validate_email(email):
+    """Validate email address format if provided."""
+    if not email:
+        return True, ""
+    clean_email = email.strip()
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', clean_email):
+        return False, "Invalid email address format."
+    return True, clean_email
+
+def validate_phone(phone):
+    """Validate 10-digit phone number if provided."""
+    if not phone:
+        return True, ""
+    clean_phone = phone.strip()
+    if not re.match(r'^\+?[0-9]{7,15}$', clean_phone):
+        return False, "Invalid phone number format."
+    return True, clean_phone
+
+def validate_semester(semester):
+    """Ensure semester is an integer between 1 and 8."""
+    try:
+        sem_num = int(semester)
+        if sem_num < 1 or sem_num > 8:
+            return False, 3, "Semester must be between 1 and 8."
+        return True, str(sem_num), None
+    except (ValueError, TypeError):
+        return False, 3, "Semester must be a valid number."
