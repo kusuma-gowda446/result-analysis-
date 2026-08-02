@@ -9,6 +9,8 @@ services:
     restart: always
     ports:
       - "5000:5000"
+    volumes:
+      - .:/app
     environment:
       - MONGO_URI=mongodb://mongodb:27017/marks_analyser
       - SECRET_KEY=shridevi-production-secure-key-2024

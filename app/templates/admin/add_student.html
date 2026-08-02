@@ -1,99 +1,114 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if student %}Edit Student {{ student.usn }}{% else %}Add New Student{% endif %}{% endblock %}
+{% block title %}{% if student %}Edit Student {{ student.usn }}{% else %}Add New Student{% endif %} — SIET Tumakuru{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2>{% if student %}✏️ Edit Student Profile ({{ student.usn }}){% else %}➕ Add New Student Record{% endif %}</h2>
-        <a href="{{ url_for('admin.all_students') }}" class="btn btn-secondary">← Back to List</a>
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-transparent border-0 d-flex align-items-center justify-content-between p-3 p-lg-4">
+        <div>
+            <h4 class="fw-bold mb-1 text-dark-emphasis">
+                <i class="bi bi-person-badge-fill text-primary me-2"></i>
+                {% if student %}Edit Student Record ({{ student.usn }}){% else %}Register New Student{% endif %}
+            </h4>
+            <p class="text-muted small mb-0">Fill in mandatory profile details and academic internal marks.</p>
+        </div>
+        <a href="{{ url_for('admin.all_students') }}" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to Student List
+        </a>
     </div>
-    <div class="card-body">
+
+    <div class="card-body p-3 p-lg-4 pt-0">
         <form method="POST" action="{% if student %}{{ url_for('admin.edit_student', usn=student.usn) }}{% else %}{{ url_for('admin.add_student') }}{% endif %}">
             
-            <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">Student Profile Information (All 9 Required Fields)</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                <div class="form-group">
-                    <label for="usn">1. USN (University Seat Number)</label>
-                    <input type="text" id="usn" name="usn" value="{% if student %}{{ student.usn }}{% endif %}" class="form-control text-uppercase" placeholder="e.g. 1SG24AI001" required {% if student %}readonly style="background: #e2e8f0;"{% endif %}>
-                </div>
-                
-                <div class="form-group">
-                    <label for="name">2. Student Full Name</label>
-                    <input type="text" id="name" name="name" value="{% if student %}{{ student.name }}{% endif %}" class="form-control" placeholder="Full Name" required>
+            <h6 class="fw-bold text-primary text-uppercase mb-3 pb-2 border-bottom">
+                <i class="bi bi-person-lines-fill me-1"></i> Student Personal Profile Information (9 Mandatory Fields)
+            </h6>
+
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="usn" class="form-label fw-semibold">1. USN (University Seat Number)</label>
+                    <input type="text" id="usn" name="usn" value="{% if student %}{{ student.usn }}{% endif %}" class="form-control text-uppercase font-monospace fw-bold" placeholder="e.g. 1SG24CS001" required {% if student %}readonly style="background-color: #e2e8f0;"{% endif %}>
                 </div>
 
-                <div class="form-group">
-                    <label for="dob">3. Date of Birth</label>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="name" class="form-label fw-semibold">2. Student Full Name</label>
+                    <input type="text" id="name" name="name" value="{% if student %}{{ student.name }}{% endif %}" class="form-control" placeholder="Enter Full Name" required>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="dob" class="form-label fw-semibold">3. Date of Birth</label>
                     <input type="date" id="dob" name="dob" value="{% if student %}{{ student.dob }}{% endif %}" class="form-control" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="department">4. Department</label>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="department" class="form-label fw-semibold">4. Department</label>
                     <input type="text" id="department" name="department" value="{% if student %}{{ student.department }}{% else %}Computer Science & Engineering{% endif %}" class="form-control" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="semester">5. Semester</label>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="semester" class="form-label fw-semibold">5. Semester</label>
                     <input type="text" id="semester" name="semester" value="{% if student %}{{ student.semester }}{% else %}3{% endif %}" class="form-control" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="section">6. Section</label>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="section" class="form-label fw-semibold">6. Section</label>
                     <input type="text" id="section" name="section" value="{% if student %}{{ student.section }}{% else %}A{% endif %}" class="form-control text-uppercase" placeholder="A, B, C..." required>
                 </div>
 
-                <div class="form-group">
-                    <label for="phone">7. Phone Number</label>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="phone" class="form-label fw-semibold">7. Phone Number</label>
                     <input type="tel" id="phone" name="phone" value="{% if student %}{{ student.phone }}{% endif %}" class="form-control" placeholder="e.g. 9876543210">
                 </div>
 
-                <div class="form-group">
-                    <label for="email">8. Email Address</label>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="email" class="form-label fw-semibold">8. Email Address</label>
                     <input type="email" id="email" name="email" value="{% if student %}{{ student.email }}{% endif %}" class="form-control" placeholder="student@example.com">
                 </div>
 
-                <div class="form-group" style="grid-column: 1 / -1;">
-                    <label for="address">9. Address</label>
-                    <textarea id="address" name="address" class="form-control" rows="2" placeholder="Residential Address">{% if student %}{{ student.address }}{% endif %}</textarea>
+                <div class="col-12">
+                    <label for="address" class="form-label fw-semibold">9. Residential Address</label>
+                    <textarea id="address" name="address" class="form-control" rows="2" placeholder="Full Postal Address">{% if student %}{{ student.address }}{% endif %}</textarea>
                 </div>
             </div>
 
             {% if not student %}
-            <div class="form-group" style="margin-bottom: 24px; background: #eff6ff; padding: 12px 16px; border-radius: var(--radius-sm);">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform: none;">
-                    <input type="checkbox" name="create_user_account" value="1" checked style="width: 18px; height: 18px;">
-                    <strong>Auto-create Student Login Account</strong> (Username = USN, Password = USN)
+            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4">
+                <input class="form-check-input me-3 fs-5" type="checkbox" name="create_user_account" value="1" id="autoUser" checked>
+                <label class="form-check-label text-dark fw-semibold mb-0" for="autoUser">
+                    Automatically create Student Portal Login Account (Username = USN, Password = USN)
                 </label>
             </div>
             {% endif %}
 
-            <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">Subject Marks & Attendance Entry</h3>
-            <div class="table-responsive" style="margin-bottom: 24px;">
-                <table class="data-table">
-                    <thead>
+            <h6 class="fw-bold text-success text-uppercase mb-3 pb-2 border-bottom">
+                <i class="bi bi-award-fill me-1"></i> Academic Subject Marks &amp; Attendance Entry
+            </h6>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th>Subject Title</th>
-                            <th>Max Marks</th>
-                            <th>Marks Obtained</th>
-                            <th>Attendance</th>
-                            <th>Remark</th>
+                            <th class="text-center">Max Marks</th>
+                            <th class="text-center">Marks Obtained</th>
+                            <th class="text-center">Attendance (%)</th>
+                            <th>Faculty Remark</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for sub in subjects %}
                         {% set m = existing_marks.get(sub.id, {}) %}
                         <tr>
-                            <td><strong>{{ sub.name }}</strong></td>
-                            <td>{{ sub.max_marks }}</td>
+                            <td class="fw-bold">{{ sub.name }}</td>
+                            <td class="text-center text-muted">{{ sub.max_marks }}</td>
                             <td>
-                                <input type="number" step="0.5" min="0" max="{{ sub.max_marks }}" name="score_{{ sub.id }}" value="{{ m.get('score', 0) }}" class="form-control" style="width: 110px;" required>
+                                <input type="number" step="0.5" min="0" max="{{ sub.max_marks }}" name="score_{{ sub.id }}" value="{{ m.get('score', 0) }}" class="form-control text-center mx-auto" style="max-width: 120px;" required>
                             </td>
                             <td>
-                                <input type="text" name="att_{{ sub.id }}" value="{{ m.get('attendance', '90%') }}" class="form-control" style="width: 120px;">
+                                <input type="text" name="att_{{ sub.id }}" value="{{ m.get('attendance', '90%') }}" class="form-control text-center mx-auto" style="max-width: 120px;">
                             </td>
                             <td>
-                                <input type="text" name="remark_{{ sub.id }}" value="{{ m.get('remark', 'Satisfactory') }}" class="form-control" style="width: 150px;">
+                                <input type="text" name="remark_{{ sub.id }}" value="{{ m.get('remark', 'Satisfactory') }}" class="form-control">
                             </td>
                         </tr>
                         {% endfor %}
@@ -101,9 +116,11 @@
                 </table>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <a href="{{ url_for('admin.all_students') }}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">💾 Save Student Record</button>
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ url_for('admin.all_students') }}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm">
+                    <i class="bi bi-check-circle-fill me-1"></i> Save Student Record
+                </button>
             </div>
         </form>
     </div>
