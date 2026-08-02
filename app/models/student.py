@@ -45,14 +45,14 @@ class StudentModel:
         return list(db.students.find().sort('_id', -1).limit(limit))
 
     @staticmethod
-    def save_student(usn, name, dob='', department='AI & Data Science', semester='3', section='A', phone='', email='', address='', year='2024-25'):
+    def save_student(usn, name, dob='', department='Computer Science & Engineering', semester='3', section='A', phone='', email='', address='', year='2024-25'):
         db = get_db()
         clean_usn = str(usn).strip().upper()
         doc = {
             'usn': clean_usn,
             'name': str(name).strip(),
             'dob': str(dob).strip() if dob else '',
-            'department': str(department).strip() if department else 'AI & Data Science',
+            'department': str(department).strip() if department else 'Computer Science & Engineering',
             'semester': str(semester).strip() if semester else '3',
             'section': str(section).strip().upper() if section else 'A',
             'phone': str(phone).strip() if phone else '',

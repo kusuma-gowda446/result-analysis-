@@ -45,7 +45,7 @@ def add_student():
 
         name  = request.form.get('name', '').strip()
         dob   = request.form.get('dob', '').strip()
-        dept  = request.form.get('department', 'AI & Data Science').strip()
+        dept  = request.form.get('department', 'Computer Science & Engineering').strip()
         sem   = request.form.get('semester', '3').strip()
         sec   = request.form.get('section', 'A').strip().upper()
         phone = request.form.get('phone', '').strip()
@@ -91,7 +91,7 @@ def edit_student(usn):
     if request.method == 'POST':
         name  = request.form.get('name', '').strip()
         dob   = request.form.get('dob', '').strip()
-        dept  = request.form.get('department', 'AI & Data Science').strip()
+        dept  = request.form.get('department', 'Computer Science & Engineering').strip()
         sem   = request.form.get('semester', '3').strip()
         sec   = request.form.get('section', 'A').strip().upper()
         phone = request.form.get('phone', '').strip()

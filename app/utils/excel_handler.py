@@ -11,7 +11,7 @@ def generate_csv_template():
     for sub in subjects:
         headers.extend([f"{sub['name']}_Score", f"{sub['name']}_Attendance", f"{sub['name']}_Remark"])
 
-    sample_row = ['1SG24AI001', 'Rahul Kumar', '2004-05-15', 'AI & Data Science', '3', 'A', '9876543210', 'rahul@example.com', 'Bangalore, India']
+    sample_row = ['1SG24AI001', 'Rahul Kumar', '2004-05-15', 'Computer Science & Engineering', '3', 'A', '9876543210', 'rahul@example.com', 'Bangalore, India']
     for _ in subjects:
         sample_row.extend(['12.5', '90%', 'Good'])
 
@@ -48,7 +48,7 @@ def process_bulk_upload(file_stream, file_filename):
             continue
 
         dob = str(row.get('DOB', '')).strip()
-        dept = str(row.get('Department', 'AI & Data Science')).strip()
+        dept = str(row.get('Department', 'Computer Science & Engineering')).strip()
         sem = str(row.get('Semester', '3')).strip()
         sec = str(row.get('Section', 'A')).strip().upper()
         phone = str(row.get('Phone', '')).strip()

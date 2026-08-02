@@ -8,7 +8,7 @@ from reportlab.lib.units import mm
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
 def generate_pdf_report(student):
-    """Generates an official, print-ready PDF Marks Card for a student."""
+    """Generates an official, print-ready PDF Marks Card with Header Banner for a student."""
     buffer = io.BytesIO()
     navy  = colors.HexColor('#0e2245')
     gold  = colors.HexColor('#d97706')
@@ -18,8 +18,8 @@ def generate_pdf_report(student):
 
     doc = SimpleDocTemplate(
         buffer, pagesize=letter,
-        leftMargin=14*mm, rightMargin=14*mm,
-        topMargin=12*mm, bottomMargin=12*mm
+        leftMargin=12*mm, rightMargin=12*mm,
+        topMargin=10*mm, bottomMargin=10*mm
     )
     styles = getSampleStyleSheet()
     story  = []
@@ -30,19 +30,16 @@ def generate_pdf_report(student):
         # Outer thick border
         cv.setStrokeColor(navy)
         cv.setLineWidth(2.5)
-        cv.rect(8*mm, 8*mm, W-16*mm, H-16*mm)
+        cv.rect(6*mm, 6*mm, W-12*mm, H-12*mm)
         # Inner fine gold border
         cv.setStrokeColor(gold)
         cv.setLineWidth(0.75)
-        cv.rect(10.5*mm, 10.5*mm, W-21*mm, H-21*mm)
+        cv.rect(8.5*mm, 8.5*mm, W-17*mm, H-17*mm)
         cv.restoreState()
 
     def ps(name, **kw):
         return ParagraphStyle(name, parent=styles[kw.pop('parent', 'Normal')], **kw)
 
-    affil_s = ps('affil', fontSize=8, textColor=colors.HexColor('#475569'), alignment=TA_CENTER, fontName='Helvetica-Bold')
-    title_s = ps('title', fontSize=15, textColor=navy, alignment=TA_CENTER, fontName='Helvetica-Bold', leading=18)
-    addr_s  = ps('addr',  fontSize=8, textColor=colors.HexColor('#334155'), alignment=TA_CENTER, leading=11)
     dept_s  = ps('dept',  fontSize=10, textColor=colors.white, alignment=TA_CENTER, fontName='Helvetica-Bold')
     rpt_s   = ps('rpt',   fontSize=12, textColor=navy, alignment=TA_CENTER, fontName='Helvetica-Bold')
     sub_s   = ps('sub',   fontSize=8.5, textColor=colors.HexColor('#475569'), alignment=TA_CENTER, fontName='Helvetica-Oblique')
@@ -52,46 +49,29 @@ def generate_pdf_report(student):
     sig_s   = ps('sig',   fontSize=8.5, textColor=navy, alignment=TA_CENTER, fontName='Helvetica-Bold')
     foot_s  = ps('foot',  fontSize=7.5, textColor=colors.HexColor('#64748b'), alignment=TA_CENTER)
 
-    # 1. Header with Logo & College Info
-    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images', 'logo.png')
-    logo_img = None
-    if os.path.exists(logo_path):
+    # 1. Official Header Banner Image
+    banner_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images', 'header_banner.png')
+    if os.path.exists(banner_path):
         try:
-            logo_img = Image(logo_path, width=28*mm, height=28*mm)
+            banner_img = Image(banner_path, width=doc.width, height=28*mm)
+            story.append(banner_img)
         except Exception:
-            logo_img = None
-
-    header_text_nodes = [
-        Paragraph('AFFILIATED TO VTU, BELAGAVI | APPROVED BY AICTE, NEW DELHI | RECOGNIZED BY GOVT. OF KARNATAKA', affil_s),
-        Spacer(1, 2),
-        Paragraph('SHRIDEVI INSTITUTE OF ENGINEERING AND TECHNOLOGY', title_s),
-        Paragraph('Sira Road, Tumakuru – 572 106, Karnataka, India', addr_s),
-        Paragraph('Phone: 0816-2258000 | Email: principal@shrideviiet.ac.in | Web: www.shrideviiet.ac.in', addr_s),
-    ]
-
-    if logo_img:
-        header_table = Table([[logo_img, header_text_nodes]], colWidths=[32*mm, doc.width - 32*mm])
-        header_table.setStyle(TableStyle([
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('ALIGN', (0,0), (0,0), 'CENTER'),
-            ('LEFTPADDING', (0,0), (-1,-1), 0),
-            ('RIGHTPADDING', (0,0), (-1,-1), 0),
-        ]))
-        story.append(header_table)
-    else:
-        for node in header_text_nodes:
-            story.append(node)
+            pass
 
     story += [
-        Spacer(1, 6),
+        Spacer(1, 4),
         HRFlowable(width='100%', thickness=1.5, color=navy),
         Spacer(1, 4),
     ]
 
-    # Department Banner
-    dept_name = student.get('department', 'DEPARTMENT OF ARTIFICIAL INTELLIGENCE & DATA SCIENCE').upper()
-    if not dept_name.startswith('DEPARTMENT OF'):
-        dept_name = f"DEPARTMENT OF {dept_name}"
+    # Department Banner (Filter out AIDA / AI ML)
+    raw_dept = student.get('department', 'Computer Science & Engineering')
+    if any(x in raw_dept.upper() for x in ['AIDA', 'AI ML', 'AI & DS', 'ARTIFICIAL INTELLIGENCE']):
+        dept_name = 'DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING'
+    else:
+        dept_name = raw_dept.upper()
+        if not dept_name.startswith('DEPARTMENT OF'):
+            dept_name = f"DEPARTMENT OF {dept_name}"
 
     dept_tbl = Table([[Paragraph(dept_name, dept_s)]], colWidths=[doc.width])
     dept_tbl.setStyle(TableStyle([
@@ -106,13 +86,17 @@ def generate_pdf_report(student):
         Spacer(1, 6), HRFlowable(width='100%', thickness=0.75, color=gold), Spacer(1, 6)
     ]
 
-    # 2. Student Details Table (USN, Name, DOB, Dept, Sem, Sec, Phone, Email)
+    # 2. Student Details Table
     half = doc.width / 2
+    student_dept = student.get('department', 'Computer Science & Engineering')
+    if any(x in student_dept.upper() for x in ['AIDA', 'AI ML', 'AI & DS', 'ARTIFICIAL INTELLIGENCE']):
+        student_dept = 'Computer Science & Engineering'
+
     det = Table([
         [Paragraph('Student Name', lbl_s), Paragraph(student.get('name', '-'), val_s),
          Paragraph('USN', lbl_s),          Paragraph(student.get('usn', '-'), val_s)],
         [Paragraph('Date of Birth', lbl_s),Paragraph(student.get('dob', '-'), val_s),
-         Paragraph('Department', lbl_s),   Paragraph(student.get('department', 'AI & DS'), val_s)],
+         Paragraph('Department', lbl_s),   Paragraph(student_dept, val_s)],
         [Paragraph('Semester & Sec', lbl_s),Paragraph(f"Sem {student.get('semester', '3')} - Sec {student.get('section', 'A')}", val_s),
          Paragraph('Academic Year', lbl_s),Paragraph(student.get('year', '2024-25'), val_s)],
         [Paragraph('Phone Number', lbl_s), Paragraph(student.get('phone', '-'), val_s),
@@ -198,11 +182,11 @@ def generate_pdf_report(student):
     ]))
     story += [note_tbl, Spacer(1, 18)]
 
-    # 6. Signatures Section & Official Stamp Box
+    # 6. Signatures Section & Official Footer
     sig_tbl = Table([
         [Paragraph('___________________________', sig_s), Paragraph('___________________________', sig_s), Paragraph('___________________________', sig_s)],
         [Paragraph('Class Coordinator', sig_s), Paragraph('Head of Department', sig_s), Paragraph('Principal / Controller', sig_s)],
-        [Paragraph('Signature &amp; Date', note_s), Paragraph(f"Dept. of {student.get('department', 'AI & DS')}", note_s), Paragraph('SIET, Tumakuru', note_s)],
+        [Paragraph('Signature &amp; Date', note_s), Paragraph('SIET Tumakuru', note_s), Paragraph('SIET, Tumakuru', note_s)],
     ], colWidths=[doc.width/3]*3)
     sig_tbl.setStyle(TableStyle([
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),

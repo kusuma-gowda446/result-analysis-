@@ -93,7 +93,7 @@ class ReportService:
             'semester':       row.get('semester', '3'),
             'section':        row.get('section', 'A'),
             'year':           row.get('year', '2024-25'),
-            'department':     row.get('department', 'AI & Data Science'),
+            'department':     row.get('department', 'Computer Science & Engineering'),
             'phone':          row.get('phone', '-'),
             'email':          row.get('email', '-'),
             'address':        row.get('address', '-'),

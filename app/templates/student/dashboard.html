@@ -7,7 +7,7 @@
 <div class="glass-card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
     <div>
         <h1 style="color: white; font-size: 1.8rem; font-weight: 700; margin: 0;">Welcome, {{ student.name if student else username }} 👋</h1>
-        <p style="opacity: 0.85; margin-top: 6px; margin-bottom: 0;">USN: <strong>{{ student.usn if student else session.get('student_usn') }}</strong> | Department of {{ student.department if student else 'AI & Data Science' }}</p>
+        <p style="opacity: 0.85; margin-top: 6px; margin-bottom: 0;">USN: <strong>{{ student.usn if student else session.get('student_usn') }}</strong> | Department of {{ student.department if student else 'Computer Science & Engineering' }}</p>
     </div>
     <div style="display: flex; gap: 12px;">
         {% if student %}
