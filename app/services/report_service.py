@@ -32,7 +32,7 @@ class ReportService:
                 internal = float(mark.get('internal_marks', mark.get('score', 0.0)))
                 external = float(mark.get('external_marks', 0.0))
                 score = mark.get('total', internal + external)
-                res = mark.get('result', MarkModel.calculate_result(internal, external, score, sub['max_marks']))
+                res = MarkModel.calculate_result(internal, external, score, sub['max_marks'])
                 gp = mark.get('grade_point', MarkModel.calculate_grade_point(score, sub['max_marks']))
                 att = mark.get('attendance', '90%')
                 rem = mark.get('remark', 'Good')

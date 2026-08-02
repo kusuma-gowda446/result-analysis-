@@ -22,9 +22,10 @@ class MarkModel:
 
     @staticmethod
     def calculate_result(internal, external, total, max_marks=100.0):
-        pass_mark = max_marks * 0.40
-        min_external = max_marks * 0.30
-        if total >= pass_mark and external >= min_external:
+        if not max_marks or float(max_marks) <= 0:
+            max_marks = 100.0
+        pass_mark = float(max_marks) * 0.40
+        if float(total) >= pass_mark:
             return 'PASS'
         return 'FAIL'
 
