@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}All Students{% endblock %}
+{% block title %}Student Management — Shridevi Institute{% endblock %}
 
 {% block content %}
 <div class="card" style="margin-bottom: 24px;">
     <div class="card-header">
-        <h2>🎓 Student Records</h2>
+        <h2>🎓 Student Management System (Admin CRUD)</h2>
         <div style="display: flex; gap: 10px;">
-            <a href="{{ url_for('admin.bulk_upload') }}" class="btn btn-success">📁 Bulk Upload</a>
-            <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary">➕ Add Student</a>
+            <a href="{{ url_for('admin.bulk_upload') }}" class="btn btn-success">📁 Bulk Import</a>
+            <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary">➕ Add New Student</a>
         </div>
     </div>
     <div class="card-body">
         <!-- Search filter -->
         <form action="{{ url_for('admin.all_students') }}" method="GET" style="display: flex; gap: 12px; margin-bottom: 20px;">
-            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by USN or Name..." style="max-width: 360px;">
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by USN, Name, Dept, Phone, Email..." style="max-width: 400px;">
             <button type="submit" class="btn btn-primary">Search</button>
             {% if query %}
             <a href="{{ url_for('admin.all_students') }}" class="btn btn-secondary">Clear</a>
@@ -27,9 +27,12 @@
                     <tr>
                         <th>USN</th>
                         <th>Student Name</th>
+                        <th>DOB</th>
                         <th>Department</th>
-                        <th>Semester</th>
-                        <th>Year</th>
+                        <th>Sem & Sec</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Address</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -38,23 +41,26 @@
                     <tr>
                         <td><strong>{{ s.usn }}</strong></td>
                         <td>{{ s.name }}</td>
-                        <td>{{ s.department }}</td>
-                        <td>Sem {{ s.semester }}</td>
-                        <td>{{ s.year }}</td>
-                        <td style="display: flex; gap: 8px;">
+                        <td>{{ s.dob or '-' }}</td>
+                        <td>{{ s.department or 'AI & Data Science' }}</td>
+                        <td>Sem {{ s.semester or '3' }} (Sec {{ s.section or 'A' }})</td>
+                        <td>{{ s.phone or '-' }}</td>
+                        <td>{{ s.email or '-' }}</td>
+                        <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ s.address or '-' }}">{{ s.address or '-' }}</td>
+                        <td style="display: flex; gap: 6px;">
                             <form action="{{ url_for('student.search') }}" method="POST" style="display: inline;">
                                 <input type="hidden" name="usn" value="{{ s.usn }}">
-                                <button type="submit" class="btn btn-secondary btn-sm">👁️ View</button>
+                                <button type="submit" class="btn btn-secondary btn-sm" title="View Report">👁️</button>
                             </form>
-                            <a href="{{ url_for('admin.edit_student', usn=s.usn) }}" class="btn btn-primary btn-sm">✏️ Edit</a>
-                            <a href="{{ url_for('student.download_pdf', usn=s.usn) }}" class="btn btn-secondary btn-sm">📄 PDF</a>
-                            <form action="{{ url_for('admin.delete_student', usn=s.usn) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete student {{ s.usn }}?');">
-                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                            <a href="{{ url_for('admin.edit_student', usn=s.usn) }}" class="btn btn-primary btn-sm" title="Edit Student">✏️ Edit</a>
+                            <a href="{{ url_for('student.download_pdf', usn=s.usn) }}" class="btn btn-secondary btn-sm" title="Download PDF">📄</a>
+                            <form action="{{ url_for('admin.delete_student', usn=s.usn) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete student {{ s.usn }} ({{ s.name }})?');">
+                                <button type="submit" class="btn btn-danger btn-sm" title="Delete Student">🗑️ Delete</button>
                             </form>
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="6" style="text-align: center; padding: 32px;">No student records found.</td></tr>
+                    <tr><td colspan="9" style="text-align: center; padding: 32px;">No student records found.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

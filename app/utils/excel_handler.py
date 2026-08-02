@@ -4,14 +4,14 @@ from app.models.subject import SubjectModel
 from app.models.student import StudentModel
 
 def generate_csv_template():
-    """Generate sample CSV template file for bulk student marks upload."""
+    """Generate sample CSV template file for bulk student management upload."""
     subjects = SubjectModel.get_all()
     
-    headers = ['USN', 'Name', 'Semester', 'Year', 'Department', 'Email']
+    headers = ['USN', 'Name', 'DOB', 'Department', 'Semester', 'Section', 'Phone', 'Email', 'Address']
     for sub in subjects:
         headers.extend([f"{sub['name']}_Score", f"{sub['name']}_Attendance", f"{sub['name']}_Remark"])
 
-    sample_row = ['1SG24AI001', 'Rahul Kumar', '3', '2024-25', 'AI & Data Science', 'rahul@example.com']
+    sample_row = ['1SG24AI001', 'Rahul Kumar', '2004-05-15', 'AI & Data Science', '3', 'A', '9876543210', 'rahul@example.com', 'Bangalore, India']
     for _ in subjects:
         sample_row.extend(['12.5', '90%', 'Good'])
 
@@ -47,13 +47,26 @@ def process_bulk_upload(file_stream, file_filename):
         if not usn or not name or usn == 'NAN' or name == 'NAN':
             continue
 
-        sem = str(row.get('Semester', '3')).strip()
-        year = str(row.get('Year', '2024-25')).strip()
+        dob = str(row.get('DOB', '')).strip()
         dept = str(row.get('Department', 'AI & Data Science')).strip()
-        email = str(row.get('Email', '-')).strip()
+        sem = str(row.get('Semester', '3')).strip()
+        sec = str(row.get('Section', 'A')).strip().upper()
+        phone = str(row.get('Phone', '')).strip()
+        email = str(row.get('Email', '')).strip()
+        addr = str(row.get('Address', '')).strip()
 
-        # Save student document in 'students' collection
-        StudentModel.save_student(usn, name, sem, year, dept, email)
+        # Save student document with all 9 fields in 'students' collection
+        StudentModel.save_student(
+            usn=usn,
+            name=name,
+            dob=dob,
+            department=dept,
+            semester=sem,
+            section=sec,
+            phone=phone,
+            email=email,
+            address=addr
+        )
 
         # Save marks documents in 'marks' collection
         for sub in subjects:

@@ -1,4 +1,3 @@
-import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_file
 from app.models.student import StudentModel
 from app.models.subject import SubjectModel
@@ -27,7 +26,8 @@ def dashboard():
 def all_students():
     query = request.args.get('q', '').strip()
     students = StudentModel.get_all(query)
-    return render_template('admin/students.html', students=students, query=query)
+    subjects = SubjectModel.get_all()
+    return render_template('admin/students.html', students=students, query=query, subjects=subjects)
 
 @admin_bp.route('/add_student', methods=['GET', 'POST'])
 @admin_required
@@ -41,29 +41,38 @@ def add_student():
             flash(usn, 'danger')
             return render_template('admin/add_student.html', student=None, subjects=subjects, existing_marks={})
 
-        name = request.form.get('name', '').strip()
-        sem  = request.form.get('semester', '3').strip()
-        year = request.form.get('year', '2024-25').strip()
-        dept = request.form.get('department', 'AI & Data Science').strip()
-        email= request.form.get('email', '-').strip()
+        name  = request.form.get('name', '').strip()
+        dob   = request.form.get('dob', '').strip()
+        dept  = request.form.get('department', 'AI & Data Science').strip()
+        sem   = request.form.get('semester', '3').strip()
+        sec   = request.form.get('section', 'A').strip().upper()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        addr  = request.form.get('address', '').strip()
 
         if not name:
             flash('Student Name is required.', 'danger')
             return render_template('admin/add_student.html', student=None, subjects=subjects, existing_marks={})
 
-        try:
-            StudentModel.save_student(usn, name, sem, year, dept, email)
-            _save_marks(usn, subjects, request.form)
-            
-            if request.form.get('create_user_account'):
-                if not UserModel.get_by_username(usn):
-                    UserModel.create(username=usn, password=usn, role='student', student_usn=usn)
+        StudentModel.save_student(
+            usn=usn,
+            name=name,
+            dob=dob,
+            department=dept,
+            semester=sem,
+            section=sec,
+            phone=phone,
+            email=email,
+            address=addr
+        )
+        _save_marks(usn, subjects, request.form)
+        
+        if request.form.get('create_user_account'):
+            if not UserModel.get_by_username(usn):
+                UserModel.create(username=usn, password=usn, role='student', student_usn=usn)
 
-            flash(f'Student {usn} ({name}) added successfully!', 'success')
-            return redirect(url_for('admin.all_students'))
-        except sqlite3.IntegrityError:
-            flash(f'USN {usn} already exists in database.', 'danger')
-            return render_template('admin/add_student.html', student=None, subjects=subjects, existing_marks={})
+        flash(f'Student {usn} ({name}) added successfully!', 'success')
+        return redirect(url_for('admin.all_students'))
 
     return render_template('admin/add_student.html', student=None, subjects=subjects, existing_marks={})
 
@@ -78,17 +87,30 @@ def edit_student(usn):
     subjects = SubjectModel.get_all()
 
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        sem  = request.form.get('semester', '3').strip()
-        year = request.form.get('year', '2024-25').strip()
-        dept = request.form.get('department', 'AI & Data Science').strip()
-        email= request.form.get('email', '-').strip()
+        name  = request.form.get('name', '').strip()
+        dob   = request.form.get('dob', '').strip()
+        dept  = request.form.get('department', 'AI & Data Science').strip()
+        sem   = request.form.get('semester', '3').strip()
+        sec   = request.form.get('section', 'A').strip().upper()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        addr  = request.form.get('address', '').strip()
 
         if not name:
             flash('Student Name cannot be empty.', 'danger')
             return redirect(url_for('admin.edit_student', usn=usn))
 
-        StudentModel.save_student(usn, name, sem, year, dept, email)
+        StudentModel.save_student(
+            usn=usn,
+            name=name,
+            dob=dob,
+            department=dept,
+            semester=sem,
+            section=sec,
+            phone=phone,
+            email=email,
+            address=addr
+        )
         _save_marks(usn, subjects, request.form)
         
         flash(f'Student {usn} updated successfully!', 'success')
@@ -106,7 +128,7 @@ def edit_student(usn):
 @admin_required
 def delete_student(usn):
     StudentModel.delete(usn)
-    flash(f'Student {usn} deleted.', 'info')
+    flash(f'Student {usn} deleted successfully.', 'info')
     return redirect(url_for('admin.all_students'))
 
 def _save_marks(usn, subjects, form):
@@ -184,11 +206,8 @@ def users():
         if not username or not password:
             flash('Username and password are required.', 'danger')
         else:
-            try:
-                UserModel.create(username, password, role, student_usn)
-                flash(f'User "{username}" created successfully!', 'success')
-            except sqlite3.IntegrityError:
-                flash(f'Username "{username}" already exists.', 'danger')
+            UserModel.create(username, password, role, student_usn)
+            flash(f'User "{username}" created successfully!', 'success')
 
     all_users = UserModel.get_all_with_student_info()
     all_students = StudentModel.get_all()

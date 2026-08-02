@@ -5,42 +5,57 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2>{% if student %}✏️ Edit Student Profile & Marks ({{ student.usn }}){% else %}➕ Add New Student Record{% endif %}</h2>
+        <h2>{% if student %}✏️ Edit Student Profile ({{ student.usn }}){% else %}➕ Add New Student Record{% endif %}</h2>
         <a href="{{ url_for('admin.all_students') }}" class="btn btn-secondary">← Back to List</a>
     </div>
     <div class="card-body">
         <form method="POST" action="{% if student %}{{ url_for('admin.edit_student', usn=student.usn) }}{% else %}{{ url_for('admin.add_student') }}{% endif %}">
             
-            <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">Student Profile Information</h3>
+            <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">Student Profile Information (All 9 Required Fields)</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
                 <div class="form-group">
-                    <label for="usn">University Seat Number (USN)</label>
-                    <input type="text" id="usn" name="usn" value="{% if student %}{{ student.usn }}{% endif %}" class="form-control" placeholder="e.g. 1SG24AI001" required {% if student %}readonly style="background: #e2e8f0;"{% endif %}>
+                    <label for="usn">1. USN (University Seat Number)</label>
+                    <input type="text" id="usn" name="usn" value="{% if student %}{{ student.usn }}{% endif %}" class="form-control text-uppercase" placeholder="e.g. 1SG24AI001" required {% if student %}readonly style="background: #e2e8f0;"{% endif %}>
                 </div>
                 
                 <div class="form-group">
-                    <label for="name">Student Full Name</label>
+                    <label for="name">2. Student Full Name</label>
                     <input type="text" id="name" name="name" value="{% if student %}{{ student.name }}{% endif %}" class="form-control" placeholder="Full Name" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="department">Department / Branch</label>
+                    <label for="dob">3. Date of Birth</label>
+                    <input type="date" id="dob" name="dob" value="{% if student %}{{ student.dob }}{% endif %}" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">4. Department</label>
                     <input type="text" id="department" name="department" value="{% if student %}{{ student.department }}{% else %}AI & Data Science{% endif %}" class="form-control" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="semester">Semester</label>
+                    <label for="semester">5. Semester</label>
                     <input type="text" id="semester" name="semester" value="{% if student %}{{ student.semester }}{% else %}3{% endif %}" class="form-control" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="year">Academic Year</label>
-                    <input type="text" id="year" name="year" value="{% if student %}{{ student.year }}{% else %}2024-25{% endif %}" class="form-control" required>
+                    <label for="section">6. Section</label>
+                    <input type="text" id="section" name="section" value="{% if student %}{{ student.section }}{% else %}A{% endif %}" class="form-control text-uppercase" placeholder="A, B, C..." required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Student Email</label>
+                    <label for="phone">7. Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{% if student %}{{ student.phone }}{% endif %}" class="form-control" placeholder="e.g. 9876543210">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">8. Email Address</label>
                     <input type="email" id="email" name="email" value="{% if student %}{{ student.email }}{% endif %}" class="form-control" placeholder="student@example.com">
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="address">9. Address</label>
+                    <textarea id="address" name="address" class="form-control" rows="2" placeholder="Residential Address">{% if student %}{{ student.address }}{% endif %}</textarea>
                 </div>
             </div>
 
