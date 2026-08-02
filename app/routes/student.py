@@ -7,10 +7,10 @@ student_bp = Blueprint('student', __name__)
 @student_bp.route('/dashboard')
 @student_required
 def dashboard():
-    usn = session.get('student_usn')
+    usn = session.get('student_usn') or session.get('usn') or request.args.get('usn')
     student = None
     if usn:
-        student = ReportService.build_student_report(usn)
+        student = ReportService.build_student_report(usn.strip().upper())
         
     return render_template('student/dashboard.html',
                            username=session.get('username'),
@@ -26,8 +26,9 @@ def search():
         return redirect(url_for('student.dashboard'))
 
     # Strict isolation: Students can ONLY view their own report
-    if session.get('role') == 'student' and session.get('student_usn'):
-        if target_usn != session.get('student_usn'):
+    if session.get('role') == 'student':
+        user_usn = (session.get('student_usn') or session.get('usn') or '').strip().upper()
+        if user_usn and target_usn != user_usn:
             flash('Access Restricted: You may only view your own academic report.', 'danger')
             return redirect(url_for('student.dashboard'))
 
@@ -44,8 +45,9 @@ def download_pdf(usn):
     clean_usn = usn.strip().upper()
     
     # Strict isolation: Students can ONLY download their own PDF
-    if session.get('role') == 'student' and session.get('student_usn'):
-        if clean_usn != session.get('student_usn'):
+    if session.get('role') == 'student':
+        user_usn = (session.get('student_usn') or session.get('usn') or session.get('user_id') or '').strip().upper()
+        if user_usn and clean_usn != user_usn:
             flash('Access Restricted: You may only download your own report PDF.', 'danger')
             return redirect(url_for('student.dashboard'))
 
@@ -55,6 +57,7 @@ def download_pdf(usn):
         return redirect(url_for('student.dashboard'))
 
     pdf_buffer = ReportService.generate_pdf(student)
+    pdf_buffer.seek(0)
     return send_file(
         pdf_buffer,
         as_attachment=True,
