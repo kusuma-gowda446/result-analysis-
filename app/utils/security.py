@@ -14,17 +14,14 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def deco(*a, **kw):
-        if 'user_id' not in session:
-            flash('Please log in first.', 'warning')
-            return redirect(url_for('auth.login'))
-        if session.get('role') != 'admin':
-            flash('Admin privilege required.', 'danger')
-            return redirect(url_for('student.dashboard'))
+        if 'user_id' not in session or session.get('role') != 'admin':
+            flash('Please log in as Admin to access this page.', 'warning')
+            return redirect(url_for('auth.admin_login', next=request.url))
         return f(*a, **kw)
     return deco
 
 def validate_usn(usn):
-    """Validate USN format (alphanumeric, 5-12 chars)."""
+    """Validate USN format (alphanumeric, 5-15 chars)."""
     if not usn or not isinstance(usn, str):
         return False, "USN cannot be empty."
     clean_usn = usn.strip().upper()

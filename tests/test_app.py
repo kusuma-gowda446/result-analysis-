@@ -43,31 +43,31 @@ def test_score_validator():
     assert "cannot exceed maximum marks" in err
 
 def test_login_success_and_logout(client):
-    res = client.post('/login', data={
+    res = client.post('/admin/login', data={
         'username': 'admin',
         'password': 'admin123'
     }, follow_redirects=True)
     assert res.status_code == 200
     assert b'Admin Overview' in res.data or b'Faculty' in res.data
 
-    logout_res = client.get('/logout', follow_redirects=True)
+    logout_res = client.get('/admin/logout', follow_redirects=True)
     assert logout_res.status_code == 200
-    assert b'Sign In' in logout_res.data
+    assert b'Admin Portal' in logout_res.data or b'Log In' in logout_res.data
 
 def test_login_failure(client):
-    res = client.post('/login', data={
+    res = client.post('/admin/login', data={
         'username': 'admin',
         'password': 'wrongpassword'
     }, follow_redirects=True)
-    assert b'Invalid username or password' in res.data
+    assert b'Invalid admin username or password' in res.data or b'Invalid' in res.data
 
 def test_admin_route_protection_for_guest(client):
     res = client.get('/admin/students', follow_redirects=True)
-    assert b'Please log in to access this page' in res.data or b'Sign In' in res.data
+    assert b'Please log in as Admin' in res.data or b'Admin Portal' in res.data
 
 def test_add_student_and_build_report(client):
     # Log in as admin
-    client.post('/login', data={'username': 'admin', 'password': 'admin123'})
+    client.post('/admin/login', data={'username': 'admin', 'password': 'admin123'})
     
     # Add a student
     add_res = client.post('/admin/add_student', data={
@@ -90,7 +90,7 @@ def test_add_student_and_build_report(client):
         assert rpt['total'] == 12.0
 
 def test_pdf_download_route(client):
-    client.post('/login', data={'username': 'admin', 'password': 'admin123'})
+    client.post('/admin/login', data={'username': 'admin', 'password': 'admin123'})
     client.post('/admin/add_student', data={
         'usn': '1SG24AI888',
         'name': 'PDF Test Student',

@@ -7,48 +7,47 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/')
 def index():
-    if 'user_id' in session:
-        if session.get('role') == 'admin':
-            return redirect(url_for('admin.dashboard'))
-        return redirect(url_for('student.dashboard'))
-    return redirect(url_for('auth.login'))
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('auth.admin_login'))
 
-@auth_bp.route('/login', methods=['GET', 'POST'])
-def login():
-    if 'user_id' in session:
-        if session.get('role') == 'admin':
-            return redirect(url_for('admin.dashboard'))
-        return redirect(url_for('student.dashboard'))
-        
+@auth_bp.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if session.get('role') == 'admin' and 'user_id' in session:
+        return redirect(url_for('admin.dashboard'))
+
     if request.method == 'POST':
         u = request.form.get('username', '').strip()
         p = request.form.get('password', '')
         user = UserModel.get_by_username(u)
-        
-        if user and check_password_hash(user['password'], p):
+
+        if user and check_password_hash(user['password'], p) and user.get('role') == 'admin':
             session.clear()
             session['user_id'] = user['id']
             session['username'] = user['username']
-            session['role'] = user['role']
-            session['student_usn'] = user['student_usn']
+            session['role'] = 'admin'
+            session['logged_in'] = True
             
-            flash(f"Welcome back, {user['username']}!", 'success')
+            flash(f"Welcome to Admin Portal, {user['username']}!", 'success')
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
-            if user['role'] == 'admin':
-                return redirect(url_for('admin.dashboard'))
-            return redirect(url_for('student.dashboard'))
+            return redirect(url_for('admin.dashboard'))
             
-        flash('Invalid username or password.', 'danger')
-        
-    return render_template('auth/login.html')
+        flash('Invalid admin username or password.', 'danger')
 
+    return render_template('auth/admin_login.html')
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    return admin_login()
+
+@auth_bp.route('/admin/logout')
 @auth_bp.route('/logout')
 def logout():
     session.clear()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('auth.login'))
+    flash('Logged out successfully.', 'info')
+    return redirect(url_for('auth.admin_login'))
 
 @auth_bp.route('/change_password', methods=['POST'])
 @login_required
