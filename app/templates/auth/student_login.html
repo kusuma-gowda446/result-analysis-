@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Student Login — Shridevi Institute{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="glass-card auth-card">
+        <div class="auth-header text-center mb-4">
+            <div class="auth-badge student-badge">
+                <i class="fas fa-graduation-cap"></i> Student Portal
+            </div>
+            <h2>Student Access</h2>
+            <p class="text-muted">Log in with your USN (Use USN as password)</p>
+        </div>
+
+        <form action="{{ url_for('auth.student_login') }}" method="POST">
+            <div class="form-group mb-3">
+                <label for="usn" class="form-label">
+                    <i class="fas fa-id-card text-primary"></i> University Seat Number (USN)
+                </label>
+                <input type="text" id="usn" name="usn" class="form-control text-uppercase" placeholder="e.g. 1SG24AI001" required autofocus style="text-transform: uppercase;">
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock text-primary"></i> Password (USN)
+                </label>
+                <input type="password" id="password" name="password" class="form-control text-uppercase" placeholder="Enter your USN as password" required style="text-transform: uppercase;">
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block w-100 py-2">
+                <i class="fas fa-sign-in-alt me-2"></i> Log In to Student Portal
+            </button>
+        </form>
+
+        <div class="auth-footer text-center mt-4">
+            <a href="{{ url_for('auth.admin_login') }}" class="text-muted small">
+                <i class="fas fa-user-shield me-1"></i> Faculty / Admin Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
 from app.models.user import UserModel
+from app.models.student import StudentModel
 from app.utils.security import login_required
 
 auth_bp = Blueprint('auth', __name__)
@@ -9,7 +10,38 @@ auth_bp = Blueprint('auth', __name__)
 def index():
     if session.get('role') == 'admin':
         return redirect(url_for('admin.dashboard'))
-    return redirect(url_for('auth.admin_login'))
+    elif session.get('role') == 'student':
+        return redirect(url_for('student.dashboard'))
+    return redirect(url_for('auth.student_login'))
+
+@auth_bp.route('/student/login', methods=['GET', 'POST'])
+def student_login():
+    if session.get('role') == 'student' and session.get('student_usn'):
+        return redirect(url_for('student.dashboard'))
+
+    if request.method == 'POST':
+        usn = request.form.get('usn', '').strip().upper()
+        password = request.form.get('password', '').strip()
+
+        student = StudentModel.authenticate(usn, password)
+        if student:
+            session.clear()
+            session['user_id'] = student['usn']
+            session['usn'] = student['usn']
+            session['student_usn'] = student['usn']
+            session['username'] = student['name']
+            session['role'] = 'student'
+            session['logged_in'] = True
+
+            flash(f"Welcome back, {student['name']}!", 'success')
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
+            return redirect(url_for('student.dashboard'))
+
+        flash('Invalid USN or Password. Please enter your USN as both username and password.', 'danger')
+
+    return render_template('auth/student_login.html')
 
 @auth_bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -40,18 +72,23 @@ def admin_login():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    return admin_login()
+    return student_login()
 
-@auth_bp.route('/admin/logout')
 @auth_bp.route('/logout')
+@auth_bp.route('/admin/logout')
+@auth_bp.route('/student/logout')
 def logout():
     session.clear()
     flash('Logged out successfully.', 'info')
-    return redirect(url_for('auth.admin_login'))
+    return redirect(url_for('auth.student_login'))
 
 @auth_bp.route('/change_password', methods=['POST'])
 @login_required
 def change_password():
+    if session.get('role') == 'student':
+        flash('Password modification not allowed for student accounts.', 'danger')
+        return redirect(url_for('student.dashboard'))
+
     current_p = request.form.get('current_password', '')
     new_p     = request.form.get('new_password', '')
     confirm_p = request.form.get('confirm_password', '')

@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_file
 from app.services.report_service import ReportService
-from app.utils.security import login_required
+from app.utils.security import student_required
 
 student_bp = Blueprint('student', __name__)
 
 @student_bp.route('/dashboard')
-@login_required
+@student_required
 def dashboard():
     usn = session.get('student_usn')
     student = None
@@ -18,13 +18,14 @@ def dashboard():
                            student=student)
 
 @student_bp.route('/search', methods=['POST'])
-@login_required
+@student_required
 def search():
     target_usn = request.form.get('usn', '').strip().upper()
     if not target_usn:
         flash('Please enter a valid USN.', 'warning')
         return redirect(url_for('student.dashboard'))
 
+    # Strict isolation: Students can ONLY view their own report
     if session.get('role') == 'student' and session.get('student_usn'):
         if target_usn != session.get('student_usn'):
             flash('Access Restricted: You may only view your own academic report.', 'danger')
@@ -38,13 +39,14 @@ def search():
     return render_template('student/report.html', student=student)
 
 @student_bp.route('/download_pdf/<usn>')
-@login_required
+@student_required
 def download_pdf(usn):
     clean_usn = usn.strip().upper()
     
+    # Strict isolation: Students can ONLY download their own PDF
     if session.get('role') == 'student' and session.get('student_usn'):
         if clean_usn != session.get('student_usn'):
-            flash('Unauthorized to download PDF for another student.', 'danger')
+            flash('Access Restricted: You may only download your own report PDF.', 'danger')
             return redirect(url_for('student.dashboard'))
 
     student = ReportService.build_student_report(clean_usn)

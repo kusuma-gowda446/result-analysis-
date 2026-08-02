@@ -2,6 +2,7 @@ import os
 import pytest
 from app import create_app
 from app.database import get_db, init_db, build_student_report
+from app.models.student import StudentModel
 from app.utils.security import validate_usn, validate_score
 
 @pytest.fixture
@@ -13,6 +14,23 @@ def client():
     with app.test_client() as client:
         with app.app_context():
             init_db(app)
+            # Add test students for student login tests
+            StudentModel.save_student(
+                usn='1SG24AI001',
+                name='Rahul Kumar',
+                semester='3',
+                year='2024-25',
+                department='AI & Data Science',
+                email='rahul@example.com'
+            )
+            StudentModel.save_student(
+                usn='1SG24AI002',
+                name='Priya Sharma',
+                semester='3',
+                year='2024-25',
+                department='AI & Data Science',
+                email='priya@example.com'
+            )
         yield client
         with app.app_context():
             db = get_db()
@@ -42,7 +60,7 @@ def test_score_validator():
     assert valid is False
     assert "cannot exceed maximum marks" in err
 
-def test_login_success_and_logout(client):
+def test_admin_login_success_and_logout(client):
     res = client.post('/admin/login', data={
         'username': 'admin',
         'password': 'admin123'
@@ -52,14 +70,39 @@ def test_login_success_and_logout(client):
 
     logout_res = client.get('/admin/logout', follow_redirects=True)
     assert logout_res.status_code == 200
-    assert b'Admin Portal' in logout_res.data or b'Log In' in logout_res.data
+    assert b'Student Access' in logout_res.data or b'Student Portal' in logout_res.data
 
-def test_login_failure(client):
-    res = client.post('/admin/login', data={
-        'username': 'admin',
+def test_student_login_success_and_isolation(client):
+    # Log in as student using USN as username AND USN as password ('1SG24AI001')
+    res = client.post('/student/login', data={
+        'usn': '1SG24AI001',
+        'password': '1SG24AI001'
+    }, follow_redirects=True)
+    assert res.status_code == 200
+    assert b'Rahul Kumar' in res.data or b'Dashboard' in res.data
+
+    # Attempt to access admin route as student -> MUST BE BLOCKED
+    admin_res = client.get('/admin/students', follow_redirects=True)
+    assert b'Access Denied' in admin_res.data or b'Admin privileges required' in admin_res.data
+
+    # Attempt to view another student's report -> MUST BE RESTRICTED
+    other_res = client.post('/search', data={'usn': '1SG24AI002'}, follow_redirects=True)
+    assert b'Access Restricted' in other_res.data or b'only view your own' in other_res.data
+
+def test_student_login_failure(client):
+    # Wrong password (not matching USN)
+    res = client.post('/student/login', data={
+        'usn': '1SG24AI001',
         'password': 'wrongpassword'
     }, follow_redirects=True)
-    assert b'Invalid admin username or password' in res.data or b'Invalid' in res.data
+    assert b'Invalid USN or Password' in res.data
+
+    # Non-existent USN
+    res2 = client.post('/student/login', data={
+        'usn': 'NONEXISTENT',
+        'password': 'NONEXISTENT'
+    }, follow_redirects=True)
+    assert b'Invalid USN or Password' in res2.data
 
 def test_admin_route_protection_for_guest(client):
     res = client.get('/admin/students', follow_redirects=True)

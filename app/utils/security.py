@@ -7,7 +7,7 @@ def login_required(f):
     def deco(*a, **kw):
         if 'user_id' not in session:
             flash('Please log in to access this page.', 'warning')
-            return redirect(url_for('auth.login', next=request.url))
+            return redirect(url_for('auth.student_login', next=request.url))
         return f(*a, **kw)
     return deco
 
@@ -15,8 +15,20 @@ def admin_required(f):
     @wraps(f)
     def deco(*a, **kw):
         if 'user_id' not in session or session.get('role') != 'admin':
+            if session.get('role') == 'student':
+                flash('Access Denied: Admin privileges required.', 'danger')
+                return redirect(url_for('student.dashboard'))
             flash('Please log in as Admin to access this page.', 'warning')
             return redirect(url_for('auth.admin_login', next=request.url))
+        return f(*a, **kw)
+    return deco
+
+def student_required(f):
+    @wraps(f)
+    def deco(*a, **kw):
+        if 'user_id' not in session or session.get('role') not in ['student', 'admin']:
+            flash('Please log in with your USN and name to access your dashboard.', 'warning')
+            return redirect(url_for('auth.student_login', next=request.url))
         return f(*a, **kw)
     return deco
 

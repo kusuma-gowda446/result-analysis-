@@ -5,7 +5,22 @@ class StudentModel:
     @staticmethod
     def get_by_usn(usn):
         db = get_db()
-        return db.students.find_one({'usn': usn})
+        return db.students.find_one({'usn': usn.strip().upper() if isinstance(usn, str) else usn})
+
+    @staticmethod
+    def authenticate(usn, password):
+        db = get_db()
+        if not usn or not password:
+            return None
+            
+        clean_usn = str(usn).strip().upper()
+        clean_pass = str(password).strip().upper()
+        
+        # Student logs in using USN as password
+        if clean_usn != clean_pass:
+            return None
+
+        return db.students.find_one({'usn': clean_usn})
 
     @staticmethod
     def get_all(search_query=None):
@@ -23,22 +38,24 @@ class StudentModel:
     @staticmethod
     def save_student(usn, name, semester, year, department, email):
         db = get_db()
+        clean_usn = usn.strip().upper()
         doc = {
-            'usn': usn,
-            'name': name,
+            'usn': clean_usn,
+            'name': name.strip(),
             'semester': semester,
             'year': year,
             'department': department,
             'email': email
         }
-        db.students.update_one({'usn': usn}, {'$set': doc}, upsert=True)
+        db.students.update_one({'usn': clean_usn}, {'$set': doc}, upsert=True)
 
     @staticmethod
     def delete(usn):
         db = get_db()
-        db.students.delete_one({'usn': usn})
-        db.marks.delete_many({'student_usn': usn})
-        db.admins.delete_many({'student_usn': usn})
+        clean_usn = usn.strip().upper()
+        db.students.delete_one({'usn': clean_usn})
+        db.marks.delete_many({'student_usn': clean_usn})
+        db.admins.delete_many({'student_usn': clean_usn})
 
     @staticmethod
     def count():
@@ -48,20 +65,21 @@ class StudentModel:
     @staticmethod
     def get_marks(usn):
         db = get_db()
-        return list(db.marks.find({'student_usn': usn}))
+        return list(db.marks.find({'student_usn': usn.strip().upper() if isinstance(usn, str) else usn}))
 
     @staticmethod
     def save_mark(usn, subject_id, score, attendance, remark):
         db = get_db()
+        clean_usn = usn.strip().upper()
         doc = {
-            'student_usn': usn,
+            'student_usn': clean_usn,
             'subject_id': int(subject_id),
             'score': float(score),
             'attendance': attendance,
             'remark': remark
         }
         db.marks.update_one(
-            {'student_usn': usn, 'subject_id': int(subject_id)},
+            {'student_usn': clean_usn, 'subject_id': int(subject_id)},
             {'$set': doc},
             upsert=True
         )
