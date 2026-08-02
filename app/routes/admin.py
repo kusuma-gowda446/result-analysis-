@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, send_file
 from app.models.student import StudentModel
 from app.models.subject import SubjectModel
+from app.models.mark import MarkModel
 from app.models.user import UserModel
 from app.services.bulk_service import BulkService
+from app.services.report_service import ReportService
 from app.utils.security import admin_required, validate_usn, validate_score
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -65,7 +67,7 @@ def add_student():
             email=email,
             address=addr
         )
-        _save_marks(usn, subjects, request.form)
+        _save_marks(usn, sem, subjects, request.form)
         
         if request.form.get('create_user_account'):
             if not UserModel.get_by_username(usn):
@@ -111,7 +113,7 @@ def edit_student(usn):
             email=email,
             address=addr
         )
-        _save_marks(usn, subjects, request.form)
+        _save_marks(usn, sem, subjects, request.form)
         
         flash(f'Student {usn} updated successfully!', 'success')
         return redirect(url_for('admin.all_students'))
@@ -131,20 +133,107 @@ def delete_student(usn):
     flash(f'Student {usn} deleted successfully.', 'info')
     return redirect(url_for('admin.all_students'))
 
-def _save_marks(usn, subjects, form):
-    for sub in subjects:
-        sid   = sub['id']
-        max_m = sub['max_marks']
-        raw_score = form.get(f'score_{sid}', 0)
+# ── Marks Management (Admin Only CRUD) ──
+
+@admin_bp.route('/marks')
+@admin_required
+def manage_marks_overview():
+    query = request.args.get('q', '').strip()
+    students_raw = StudentModel.get_all(query)
+    students_list = []
+    
+    for s in students_raw:
+        rpt = ReportService.build_student_report(s['usn'])
+        if rpt:
+            students_list.append(rpt)
+            
+    return render_template('admin/marks_overview.html', students=students_list, query=query)
+
+@admin_bp.route('/marks/<usn>')
+@admin_required
+def manage_student_marks(usn):
+    report = ReportService.build_student_report(usn)
+    if not report:
+        flash('Student record not found.', 'danger')
+        return redirect(url_for('admin.manage_marks_overview'))
         
-        valid, score, err = validate_score(raw_score, max_m)
-        if not valid and err:
-            flash(f"Warning for subject {sub['name']}: {err}", 'warning')
+    subjects = SubjectModel.get_all()
+    return render_template('admin/manage_student_marks.html', student=report, subjects=subjects)
+
+@admin_bp.route('/marks/add', methods=['POST'])
+@admin_required
+def add_marks():
+    usn = request.form.get('usn', '').strip().upper()
+    semester = request.form.get('semester', '3').strip()
+    subject_id = int(request.form.get('subject_id', 0))
+    internal_marks = float(request.form.get('internal_marks', 0))
+    external_marks = float(request.form.get('external_marks', 0))
+    attendance = request.form.get('attendance', '90%').strip()
+    remark = request.form.get('remark', 'Good').strip()
+
+    subject = SubjectModel.get_by_id(subject_id)
+    if not subject:
+        flash('Invalid subject selected.', 'danger')
+        return redirect(url_for('admin.manage_student_marks', usn=usn))
+
+    MarkModel.save_mark(
+        usn=usn,
+        semester=semester,
+        subject_id=subject_id,
+        subject_name=subject['name'],
+        internal_marks=internal_marks,
+        external_marks=external_marks,
+        max_marks=subject['max_marks'],
+        attendance=attendance,
+        remark=remark
+    )
+    flash(f"Marks added successfully for subject '{subject['name']}'!", 'success')
+    return redirect(url_for('admin.manage_student_marks', usn=usn))
+
+@admin_bp.route('/marks/update', methods=['POST'])
+@admin_required
+def update_marks():
+    return add_marks()
+
+@admin_bp.route('/marks/delete/<usn>/<int:subject_id>', methods=['POST'])
+@admin_required
+def delete_marks(usn, subject_id):
+    MarkModel.delete_mark(usn, subject_id)
+    flash(f"Marks entry deleted for subject ID {subject_id}.", 'info')
+    return redirect(url_for('admin.manage_student_marks', usn=usn))
+
+def _save_marks(usn, semester, subjects, form):
+    for sub in subjects:
+        sid = sub['id']
+        max_m = sub['max_marks']
+        
+        raw_internal = form.get(f'internal_{sid}', form.get(f'score_{sid}', 0))
+        raw_external = form.get(f'external_{sid}', 0)
+        
+        try:
+            internal = float(raw_internal)
+        except (ValueError, TypeError):
+            internal = 0.0
+            
+        try:
+            external = float(raw_external)
+        except (ValueError, TypeError):
+            external = 0.0
 
         att    = form.get(f'att_{sid}', '-').strip() or '-'
         remark = form.get(f'remark_{sid}', '-').strip() or '-'
         
-        StudentModel.save_mark(usn, sid, score, att, remark)
+        MarkModel.save_mark(
+            usn=usn,
+            semester=semester,
+            subject_id=sid,
+            subject_name=sub['name'],
+            internal_marks=internal,
+            external_marks=external,
+            max_marks=max_m,
+            attendance=att,
+            remark=remark
+        )
 
 # ── Subjects ──
 

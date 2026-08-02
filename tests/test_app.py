@@ -3,6 +3,7 @@ import pytest
 from app import create_app
 from app.database import get_db, init_db, build_student_report
 from app.models.student import StudentModel
+from app.models.mark import MarkModel
 from app.utils.security import validate_usn, validate_score
 
 @pytest.fixture
@@ -42,81 +43,66 @@ def test_usn_validator():
     valid, err = validate_usn("invalid@usn#")
     assert valid is False
 
-def test_student_crud_operations(client):
+def test_marks_management_crud_operations(client):
     # 1. Admin login
     client.post('/admin/login', data={'username': 'admin', 'password': 'admin123'})
 
-    # 2. CREATE student with all 9 fields
-    add_res = client.post('/admin/add_student', data={
-        'usn': '1SG24AI005',
-        'name': 'Anita Roy',
-        'dob': '2004-08-20',
-        'department': 'AI & Data Science',
+    # 2. ADD MARKS (Internal = 35, External = 55 -> Total = 90, Result = PASS, Grade Point = 10.0)
+    add_res = client.post('/admin/marks/add', data={
+        'usn': '1SG24AI001',
         'semester': '3',
-        'section': 'B',
-        'phone': '9123456789',
-        'email': 'anita@example.com',
-        'address': 'Tumkur, Karnataka',
-        'score_1': '14.0',
-        'att_1': '95%',
-        'remark_1': 'Excellent'
+        'subject_id': 1,
+        'internal_marks': '35.0',
+        'external_marks': '55.0',
+        'attendance': '95%',
+        'remark': 'Excellent'
     }, follow_redirects=True)
     assert add_res.status_code == 200
 
-    # Verify student record created in MongoDB with all 9 fields
+    # Verify calculation in MongoDB and ReportService
     with client.application.app_context():
-        st = StudentModel.get_by_usn('1SG24AI005')
-        assert st is not None
-        assert st['name'] == 'Anita Roy'
-        assert st['dob'] == '2004-08-20'
-        assert st['department'] == 'AI & Data Science'
-        assert st['semester'] == '3'
-        assert st['section'] == 'B'
-        assert st['phone'] == '9123456789'
-        assert st['email'] == 'anita@example.com'
-        assert st['address'] == 'Tumkur, Karnataka'
+        rpt = build_student_report('1SG24AI001')
+        assert rpt is not None
+        assert rpt['total_internal'] == 35.0
+        assert rpt['total_external'] == 55.0
+        assert rpt['total'] == 90.0
+        assert rpt['result'] == 'PASS'
+        assert rpt['sgpa'] > 0.0
+        assert rpt['cgpa'] > 0.0
 
-    # 3. READ student list
-    list_res = client.get('/admin/students')
-    assert b'Anita Roy' in list_res.data
-    assert b'1SG24AI005' in list_res.data
-
-    # 4. UPDATE student
-    edit_res = client.post('/admin/edit_student/1SG24AI005', data={
-        'name': 'Anita Roy Updated',
-        'dob': '2004-08-20',
-        'department': 'AI & Data Science',
-        'semester': '4',
-        'section': 'A',
-        'phone': '9999988888',
-        'email': 'anita.updated@example.com',
-        'address': 'Bangalore, Karnataka'
+    # 3. UPDATE MARKS
+    update_res = client.post('/admin/marks/update', data={
+        'usn': '1SG24AI001',
+        'semester': '3',
+        'subject_id': 1,
+        'internal_marks': '40.0',
+        'external_marks': '58.0',
+        'attendance': '98%',
+        'remark': 'Outstanding'
     }, follow_redirects=True)
-    assert edit_res.status_code == 200
+    assert update_res.status_code == 200
 
     with client.application.app_context():
-        st_updated = StudentModel.get_by_usn('1SG24AI005')
-        assert st_updated['name'] == 'Anita Roy Updated'
-        assert st_updated['semester'] == '4'
-        assert st_updated['section'] == 'A'
+        rpt_updated = build_student_report('1SG24AI001')
+        assert rpt_updated['total_internal'] == 40.0
+        assert rpt_updated['total_external'] == 58.0
+        assert rpt_updated['total'] == 98.0
 
-    # 5. DELETE student
-    del_res = client.post('/admin/delete_student/1SG24AI005', follow_redirects=True)
+    # 4. DELETE MARKS
+    del_res = client.post('/admin/marks/delete/1SG24AI001/1', follow_redirects=True)
     assert del_res.status_code == 200
 
     with client.application.app_context():
-        st_deleted = StudentModel.get_by_usn('1SG24AI005')
-        assert st_deleted is None
+        marks_left = MarkModel.get_by_student('1SG24AI001')
+        assert len(marks_left) == 0
 
-def test_rbac_student_management_protection(client):
-    # Non-admin / student attempting to create student -> MUST BE BLOCKED
+def test_rbac_marks_protection_for_students(client):
+    # Student login
     client.post('/student/login', data={'usn': '1SG24AI001', 'password': '1SG24AI001'})
 
-    add_res = client.post('/admin/add_student', data={'usn': 'HACK001', 'name': 'Hacker'}, follow_redirects=True)
+    # Attempting to add, update, or delete marks as student -> MUST BE BLOCKED
+    add_res = client.post('/admin/marks/add', data={'usn': '1SG24AI001', 'subject_id': 1, 'internal_marks': 50, 'external_marks': 50}, follow_redirects=True)
     assert b'Access Denied' in add_res.data or b'Admin privileges required' in add_res.data
 
-    edit_res = client.post('/admin/edit_student/1SG24AI001', data={'name': 'Hacked'}, follow_redirects=True)
-    assert b'Access Denied' in edit_res.data or b'Admin privileges required' in edit_res.data
-
-    del_res = client.post('/admin/delete_student/1SG24AI001', follow_redirects=True)
+    del_res = client.post('/admin/marks/delete/1SG24AI001/1', follow_redirects=True)
     assert b'Access Denied' in del_res.data or b'Admin privileges required' in del_res.data

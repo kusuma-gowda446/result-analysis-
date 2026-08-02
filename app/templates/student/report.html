@@ -11,13 +11,13 @@
 </div>
 
 <div class="card" style="box-shadow: var(--shadow-lg);">
-    <div class="card-header" style="background: var(--primary-navy); color: white; padding: 24px;">
+    <div class="card-header" style="background: var(--primary-navy); color: white; padding: 24px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h2 style="color: white; font-size: 1.3rem;">INTERNAL ASSESSMENT PROGRESS REPORT</h2>
-            <p style="font-size: 0.85rem; opacity: 0.85; margin-top: 4px;">Shridevi Institute of Engineering and Technology</p>
+            <h2 style="color: white; font-size: 1.3rem; margin: 0;">ACADEMIC PERFORMANCE MARKS SHEET</h2>
+            <p style="font-size: 0.85rem; opacity: 0.85; margin-top: 4px; margin-bottom: 0;">Shridevi Institute of Engineering and Technology</p>
         </div>
-        <span class="badge badge-{{ student.grade.lower().replace(' ', '') }}" style="font-size: 0.9rem; padding: 6px 14px;">
-            {{ student.grade }}
+        <span class="badge" style="font-size: 1rem; padding: 6px 16px; background: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; color: white; font-weight: 700;">
+            RESULT: {{ student.result }}
         </span>
     </div>
     
@@ -26,9 +26,11 @@
             <div><strong>Student Name:</strong> {{ student.name }}</div>
             <div><strong>USN:</strong> {{ student.usn }}</div>
             <div><strong>Department:</strong> {{ student.department }}</div>
-            <div><strong>Semester:</strong> {{ student.semester }}</div>
+            <div><strong>Semester:</strong> Sem {{ student.semester }} (Sec {{ student.section }})</div>
             <div><strong>Academic Year:</strong> {{ student.year }}</div>
-            <div><strong>Percentage:</strong> {{ student.percentage }}%</div>
+            <div><strong>Overall Result:</strong> <strong style="color: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">{{ student.result }}</strong></div>
+            <div><strong>SGPA:</strong> <strong style="color: #8b5cf6;">{{ student.sgpa }}</strong></div>
+            <div><strong>CGPA:</strong> <strong style="color: #ec4899;">{{ student.cgpa }}</strong></div>
         </div>
 
         <div class="table-responsive">
@@ -37,10 +39,12 @@
                     <tr>
                         <th>Sl.</th>
                         <th>Subject Title</th>
+                        <th>Internal Marks</th>
+                        <th>External Marks</th>
+                        <th>Total Marks</th>
                         <th>Max Marks</th>
-                        <th>Marks Obtained</th>
-                        <th>Attendance</th>
-                        <th>Remarks</th>
+                        <th>Result</th>
+                        <th>Grade Point</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -48,17 +52,26 @@
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td><strong>{{ sub.name }}</strong></td>
+                        <td>{{ sub.internal_marks }}</td>
+                        <td>{{ sub.external_marks }}</td>
+                        <td><strong>{{ sub.total }}</strong></td>
                         <td>{{ sub.max }}</td>
-                        <td><strong>{{ sub.score }}</strong></td>
-                        <td>{{ sub.attendance }}</td>
-                        <td><span class="badge badge-firstclass">{{ sub.remark }}</span></td>
+                        <td>
+                            <span class="badge" style="padding: 4px 8px; border-radius: 4px; color: white; background: {% if sub.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; font-weight: 600;">
+                                {{ sub.result }}
+                            </span>
+                        </td>
+                        <td>{{ sub.grade_point }}</td>
                     </tr>
                     {% endfor %}
                     <tr style="background: #f1f5f9; font-weight: bold;">
-                        <td colspan="2">GRAND TOTAL</td>
-                        <td>{{ student.max_total }}</td>
+                        <td colspan="2">GRAND TOTAL / ACADEMIC OVERVIEW</td>
+                        <td>{{ student.total_internal }}</td>
+                        <td>{{ student.total_external }}</td>
                         <td>{{ student.total }}</td>
-                        <td colspan="2">Percentage: {{ student.percentage }}%</td>
+                        <td>{{ student.max_total }}</td>
+                        <td style="color: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">{{ student.result }}</td>
+                        <td>SGPA: {{ student.sgpa }} | CGPA: {{ student.cgpa }}</td>
                     </tr>
                 </tbody>
             </table>

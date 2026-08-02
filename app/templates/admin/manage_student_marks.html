@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Marks Management — {{ student.usn }}{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+        <h2>📊 Marks Management for {{ student.name }} ({{ student.usn }})</h2>
+        <a href="{{ url_for('admin.all_students') }}" class="btn btn-secondary">← Back to Students</a>
+    </div>
+    <div class="card-body">
+        
+        <!-- Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid var(--primary-navy);">
+                <div class="text-muted small">Semester</div>
+                <div style="font-size: 1.5rem; font-weight: 700;">Sem {{ student.semester }}</div>
+            </div>
+            <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid var(--accent-blue);">
+                <div class="text-muted small">Total Score</div>
+                <div style="font-size: 1.5rem; font-weight: 700;">{{ student.total }} / {{ student.max_total }}</div>
+            </div>
+            <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">
+                <div class="text-muted small">Result</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">{{ student.result }}</div>
+            </div>
+            <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid #8b5cf6;">
+                <div class="text-muted small">SGPA</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{ student.sgpa }}</div>
+            </div>
+            <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid #ec4899;">
+                <div class="text-muted small">CGPA</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #ec4899;">{{ student.cgpa }}</div>
+            </div>
+        </div>
+
+        <!-- Add / Update Mark Entry Form -->
+        <div class="glass-card" style="padding: 20px; margin-bottom: 24px; background: #f8fafc; border: 1px solid #e2e8f0;">
+            <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">➕ Add / Update Subject Marks Entry</h3>
+            <form action="{{ url_for('admin.add_marks') }}" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;">
+                <input type="hidden" name="usn" value="{{ student.usn }}">
+                <input type="hidden" name="semester" value="{{ student.semester }}">
+                
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="subject_id">Select Subject</label>
+                    <select id="subject_id" name="subject_id" class="form-control" required>
+                        {% for sub in subjects %}
+                        <option value="{{ sub.id }}">{{ sub.name }} (Max: {{ sub.max_marks }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="internal_marks">Internal Marks</label>
+                    <input type="number" step="0.5" id="internal_marks" name="internal_marks" class="form-control" placeholder="e.g. 25" required min="0">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="external_marks">External Marks</label>
+                    <input type="number" step="0.5" id="external_marks" name="external_marks" class="form-control" placeholder="e.g. 50" required min="0">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="attendance">Attendance</label>
+                    <input type="text" id="attendance" name="attendance" class="form-control" value="90%" placeholder="90%">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="remark">Faculty Remark</label>
+                    <input type="text" id="remark" name="remark" class="form-control" value="Satisfactory" placeholder="Remark">
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">💾 Save / Update Marks</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Marks Breakdown Table -->
+        <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">Subject Marks Breakdown</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Internal Marks</th>
+                        <th>External Marks</th>
+                        <th>Total Marks</th>
+                        <th>Max Marks</th>
+                        <th>Result</th>
+                        <th>Grade Point</th>
+                        <th>Attendance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in student.subjects %}
+                    <tr>
+                        <td><strong>{{ sub.name }}</strong></td>
+                        <td>{{ sub.internal_marks }}</td>
+                        <td>{{ sub.external_marks }}</td>
+                        <td><strong>{{ sub.total }}</strong></td>
+                        <td>{{ sub.max }}</td>
+                        <td>
+                            <span class="badge {% if sub.result == 'PASS' %}badge-success{% else %}badge-danger{% endif %}" style="padding: 4px 8px; border-radius: 4px; color: white; background: {% if sub.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; font-weight: 600;">
+                                {{ sub.result }}
+                            </span>
+                        </td>
+                        <td>{{ sub.grade_point }}</td>
+                        <td>{{ sub.attendance }}</td>
+                        <td>
+                            <form action="{{ url_for('admin.delete_marks', usn=student.usn, subject_id=sub.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete marks for {{ sub.name }}?');">
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete Marks</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9" style="text-align: center; padding: 24px;">No subject marks recorded yet. Use the form above to add marks.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
