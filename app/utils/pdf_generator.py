@@ -64,14 +64,11 @@ def generate_pdf_report(student):
         Spacer(1, 4),
     ]
 
-    # Department Banner (Filter out AIDA / AI ML)
+    # Department Banner
     raw_dept = student.get('department', 'Computer Science & Engineering')
-    if any(x in raw_dept.upper() for x in ['AIDA', 'AI ML', 'AI & DS', 'ARTIFICIAL INTELLIGENCE']):
-        dept_name = 'DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING'
-    else:
-        dept_name = raw_dept.upper()
-        if not dept_name.startswith('DEPARTMENT OF'):
-            dept_name = f"DEPARTMENT OF {dept_name}"
+    dept_name = raw_dept.upper()
+    if not dept_name.startswith('DEPARTMENT OF'):
+        dept_name = f"DEPARTMENT OF {dept_name}"
 
     dept_tbl = Table([[Paragraph(dept_name, dept_s)]], colWidths=[doc.width])
     dept_tbl.setStyle(TableStyle([
@@ -86,21 +83,17 @@ def generate_pdf_report(student):
         Spacer(1, 6), HRFlowable(width='100%', thickness=0.75, color=gold), Spacer(1, 6)
     ]
 
-    # 2. Student Details Table
+    # 2. Student Details Table (Cleaned up: Name, USN, Department, Semester, Year ONLY)
     half = doc.width / 2
     student_dept = student.get('department', 'Computer Science & Engineering')
-    if any(x in student_dept.upper() for x in ['AIDA', 'AI ML', 'AI & DS', 'ARTIFICIAL INTELLIGENCE']):
-        student_dept = 'Computer Science & Engineering'
 
     det = Table([
         [Paragraph('Student Name', lbl_s), Paragraph(student.get('name', '-'), val_s),
          Paragraph('USN', lbl_s),          Paragraph(student.get('usn', '-'), val_s)],
-        [Paragraph('Date of Birth', lbl_s),Paragraph(student.get('dob', '-'), val_s),
-         Paragraph('Department', lbl_s),   Paragraph(student_dept, val_s)],
-        [Paragraph('Semester & Sec', lbl_s),Paragraph(f"Sem {student.get('semester', '3')} - Sec {student.get('section', 'A')}", val_s),
-         Paragraph('Academic Year', lbl_s),Paragraph(student.get('year', '2024-25'), val_s)],
-        [Paragraph('Phone Number', lbl_s), Paragraph(student.get('phone', '-'), val_s),
-         Paragraph('Email Address', lbl_s),Paragraph(student.get('email', '-'), val_s)],
+        [Paragraph('Department', lbl_s),   Paragraph(student_dept, val_s),
+         Paragraph('Semester & Sec', lbl_s),Paragraph(f"Sem {student.get('semester', '3')} (Sec {student.get('section', 'A')})", val_s)],
+        [Paragraph('Academic Year', lbl_s),Paragraph(student.get('year', '2024-25'), val_s),
+         Paragraph('Institution', lbl_s),  Paragraph('SIET Tumakuru', val_s)],
     ], colWidths=[half*0.32, half*0.68, half*0.32, half*0.68])
     det.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (0,-1), cream), ('BACKGROUND', (2,0), (2,-1), cream),

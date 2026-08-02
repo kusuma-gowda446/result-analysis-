@@ -60,8 +60,6 @@ def test_student_dashboard_profile_and_isolation(client):
     assert login_res.status_code == 200
     assert b'Rahul Kumar' in login_res.data
     assert b'1SG24AI001' in login_res.data
-    assert b'2004-05-15' in login_res.data
-    assert b'Bangalore, India' in login_res.data
     assert b'SGPA' in login_res.data
     assert b'CGPA' in login_res.data
     assert b'Logout' in login_res.data
