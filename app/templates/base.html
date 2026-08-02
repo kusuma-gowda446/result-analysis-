@@ -9,26 +9,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom Theme Overrides -->
+    <!-- Google Fonts: Outfit & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Theme & Glassmorphism Overrides -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        :root {
-            --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            --siet-navy: #0A192F;
-            --siet-gold: #D97706;
-        }
-
-        [data-bs-theme="dark"] {
-            --bs-body-bg: #0b1329;
-            --bs-body-color: #f1f5f9;
-            --bs-card-bg: #111c38;
-            --bs-border-color: #1e293b;
-        }
-
         .notice-strip {
             background: linear-gradient(90deg, #0A192F 0%, #1E3A8A 100%);
             color: #F8FAFC;
@@ -38,128 +25,99 @@
         }
 
         .header-banner-container {
-            background-color: #ffffff;
-            border-bottom: 3px solid var(--siet-navy);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
             padding: 10px 20px;
         }
-        [data-bs-theme="dark"] .header-banner-container {
-            background-color: #0f172a;
-            border-bottom-color: var(--siet-gold);
-        }
 
-        .sidebar-menu {
-            min-height: calc(100vh - 180px);
-            background: #0f172a;
-            color: white;
-            border-radius: 12px;
-        }
-
-        .sidebar-menu .nav-link {
-            color: #94a3b8;
-            font-weight: 500;
-            padding: 10px 16px;
-            border-radius: 8px;
-            margin-bottom: 4px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .sidebar-menu .nav-link:hover,
-        .sidebar-menu .nav-link.active {
-            color: #ffffff;
-            background-color: #1e293b;
-            border-left: 4px solid var(--siet-gold);
-        }
-
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        .glass-nav {
+            background: rgba(10, 25, 47, 0.88) !important;
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-    <!-- Top Affiliation Strip -->
-    <div class="notice-strip text-center d-none d-sm-block">
+    <!-- Top Institutional Affiliation Strip -->
+    <div class="notice-strip text-center d-none d-sm-block shadow-sm">
         <i class="bi bi-award-fill text-warning me-1"></i> Affiliated to VTU Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A Grade (2024 - 2029)
     </div>
 
-    <!-- Official College Header Banner -->
+    <!-- College Header Banner -->
     <header class="header-banner-container text-center">
         <div class="container-fluid max-w-1200">
-            <img src="{{ url_for('static', filename='images/header_banner.png') }}" alt="Shridevi Institute Banner" class="img-fluid" style="max-height: 100px; object-fit: contain;">
+            <img src="{{ url_for('static', filename='images/header_banner.png') }}" alt="Shridevi Institute Banner" class="img-fluid" style="max-height: 95px; object-fit: contain;">
         </div>
     </header>
 
-    <!-- Top Bootstrap Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <!-- Glass Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark glass-nav sticky-top shadow">
         <div class="container-fluid px-3 px-lg-4">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
-                <i class="bi bi-mortarboard-fill text-warning fs-4"></i>
-                <span>SIET Portal</span>
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2 display-font fs-4" href="/">
+                <i class="bi bi-mortarboard-fill text-warning fs-3"></i>
+                <span class="text-white">SIET Portal</span>
             </a>
             
             <div class="d-flex align-items-center gap-2 ms-auto me-2 me-lg-0 order-lg-last">
-                <!-- Dark Mode Toggle Button -->
-                <button class="btn btn-outline-light btn-sm rounded-pill px-3" id="themeToggleBtn" onclick="toggleDarkMode()">
-                    <i class="bi bi-moon-stars-fill me-1" id="themeIcon"></i>
-                    <span id="themeText">Dark</span>
+                <!-- Dark Mode Glass Toggle Button -->
+                <button class="btn btn-outline-light btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1" id="themeToggleBtn" onclick="toggleDarkMode()">
+                    <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                    <span id="themeText" class="fw-semibold">Dark</span>
                 </button>
 
                 {% if session.get('user_id') %}
                 <div class="dropdown ms-2">
-                    <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle fs-6"></i>
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3 fw-semibold shadow-sm" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-6 text-warning"></i>
                         <span>{{ session.get('username') }}</span>
-                        <span class="badge bg-warning text-dark">{{ session.get('role') | upper if session.get('role') else '' }}</span>
+                        <span class="badge bg-warning text-dark font-monospace fs-8">{{ session.get('role') | upper if session.get('role') else '' }}</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-key me-2"></i>Change Password</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end glass-card border-0 shadow-lg mt-2">
+                        <li><a class="dropdown-item py-2 fw-medium" href="#" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-key me-2 text-warning"></i>Change Password</a></li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li><a class="dropdown-item py-2 text-danger fw-semibold" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                     </ul>
                 </div>
                 {% endif %}
             </div>
 
             <!-- Navbar Toggler for Mobile -->
-            <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbarContent">
+            <button class="navbar-toggler me-2 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Navbar Links -->
             <div class="collapse navbar-collapse" id="topNavbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
                     {% if session.get('role') == 'admin' %}
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active fw-bold{% endif %}" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.all_students' %}active fw-bold{% endif %}" href="{{ url_for('admin.all_students') }}"><i class="bi bi-people me-1"></i> Students</a></li>
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.manage_subjects' %}active fw-bold{% endif %}" href="{{ url_for('admin.manage_subjects') }}"><i class="bi bi-journal-bookmark me-1"></i> Subjects</a></li>
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.users' %}active fw-bold{% endif %}" href="{{ url_for('admin.users') }}"><i class="bi bi-shield-lock me-1"></i> Accounts</a></li>
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.bulk_upload' %}active fw-bold{% endif %}" href="{{ url_for('admin.bulk_upload') }}"><i class="bi bi-file-earmark-excel me-1"></i> Bulk Import</a></li>
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'analytics.index' %}active fw-bold{% endif %}" href="{{ url_for('analytics.index') }}"><i class="bi bi-graph-up-arrow me-1"></i> Analytics</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active fw-bold text-warning{% endif %}" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.all_students' %}active fw-bold text-warning{% endif %}" href="{{ url_for('admin.all_students') }}"><i class="bi bi-people me-1"></i> Students</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.manage_subjects' %}active fw-bold text-warning{% endif %}" href="{{ url_for('admin.manage_subjects') }}"><i class="bi bi-journal-bookmark me-1"></i> Subjects</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.users' %}active fw-bold text-warning{% endif %}" href="{{ url_for('admin.users') }}"><i class="bi bi-shield-lock me-1"></i> Accounts</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.bulk_upload' %}active fw-bold text-warning{% endif %}" href="{{ url_for('admin.bulk_upload') }}"><i class="bi bi-file-earmark-excel me-1"></i> Bulk Import</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'analytics.index' %}active fw-bold text-warning{% endif %}" href="{{ url_for('analytics.index') }}"><i class="bi bi-graph-up-arrow me-1"></i> Analytics</a></li>
                     {% elif session.get('role') == 'student' %}
-                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.dashboard' %}active fw-bold{% endif %}" href="{{ url_for('student.dashboard') }}"><i class="bi bi-house-door me-1"></i> My Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.dashboard' %}active fw-bold text-warning{% endif %}" href="{{ url_for('student.dashboard') }}"><i class="bi bi-house-door me-1"></i> My Dashboard</a></li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right me-1"></i> Login</a></li>
+                        <li class="nav-item"><a class="nav-link active fw-semibold" href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right me-1"></i> Login</a></li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Container with Sidebar Layout -->
-    <div class="container-fluid py-4 px-3 px-lg-4">
+    <!-- Main Content Container with Glass Sidebar Layout -->
+    <div class="container-fluid py-4 px-3 px-lg-4 flex-grow-1">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="row justify-content-center">
                 <div class="col-12 col-lg-10">
                     {% for cat, msg in messages %}
-                        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show shadow-sm" role="alert">
+                        <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} alert-dismissible fade show glass-card border-0 shadow-sm mb-4" role="alert">
                             <i class="bi bi-info-circle-fill me-2"></i> {{ msg }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -171,10 +129,10 @@
 
         <div class="row g-4">
             {% if session.get('role') == 'admin' %}
-            <!-- Admin Sidebar Component -->
+            <!-- Admin Glass Sidebar Component -->
             <div class="col-12 col-md-3 col-xl-2 d-none d-md-block">
-                <div class="sidebar-menu p-3 shadow-sm">
-                    <div class="text-uppercase text-muted fs-7 fw-bold px-3 mb-2">Admin Portal</div>
+                <div class="glass-sidebar shadow-sm">
+                    <div class="text-uppercase text-muted fs-8 fw-bold px-3 mb-3 tracking-wider">Faculty Portal</div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
@@ -219,33 +177,33 @@
         </div>
     </div>
 
-    <!-- Password Change Modal -->
+    <!-- Password Change Glass Modal -->
     {% if session.get('user_id') %}
     <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow-lg border-0">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title"><i class="bi bi-key-fill text-warning me-2"></i> Change Password</h5>
+            <div class="modal-content glass-card border-0 shadow-lg overflow-hidden">
+                <div class="modal-header glass-header">
+                    <h5 class="modal-title font-monospace fw-bold"><i class="bi bi-key-fill text-warning me-2"></i> Change Password</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ url_for('auth.change_password') }}" method="POST">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">Current Password</label>
-                            <input type="password" name="current_password" class="form-control" required>
+                    <div class="modal-body p-4">
+                        <div class="form-floating mb-3">
+                            <input type="password" name="current_password" class="form-control" id="currPassInput" placeholder="Current Password" required>
+                            <label for="currPassInput">Current Password</label>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">New Password</label>
-                            <input type="password" name="new_password" class="form-control" required minlength="6">
+                        <div class="form-floating mb-3">
+                            <input type="password" name="new_password" class="form-control" id="newPassInput" placeholder="New Password" required minlength="6">
+                            <label for="newPassInput">New Password</label>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">Confirm New Password</label>
-                            <input type="password" name="confirm_password" class="form-control" required minlength="6">
+                        <div class="form-floating mb-3">
+                            <input type="password" name="confirm_password" class="form-control" id="confirmPassInput" placeholder="Confirm Password" required minlength="6">
+                            <label for="confirmPassInput">Confirm New Password</label>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> Update Password</button>
+                    <div class="modal-footer border-top-0 pt-0 p-4">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-glass-primary rounded-pill px-4"><i class="bi bi-check-circle me-1"></i> Update Password</button>
                     </div>
                 </form>
             </div>
@@ -253,11 +211,11 @@
     </div>
     {% endif %}
 
-    <!-- Footer -->
-    <footer class="mt-auto py-4 bg-dark text-white-50 text-center border-top">
+    <!-- Glass Footer -->
+    <footer class="mt-auto py-4 text-center border-top border-secondary-subtle" style="background: rgba(10, 25, 47, 0.95); backdrop-filter: blur(12px);">
         <div class="container">
-            <p class="mb-1 text-white">© 2024–25 Shridevi Institute of Engineering and Technology, Tumakuru</p>
-            <small class="text-muted">Affiliated to VTU, Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A Grade</small>
+            <p class="mb-1 text-white fw-semibold">© 2024–25 Shridevi Institute of Engineering and Technology, Tumakuru</p>
+            <small class="text-white-50">Affiliated to VTU, Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A Grade</small>
         </div>
     </footer>
 
@@ -285,7 +243,7 @@
             const btnIcon = document.getElementById('themeIcon');
             if (theme === 'dark') {
                 if (btnText) btnText.textContent = 'Light';
-                if (btnIcon) btnIcon.className = 'bi bi-sun-fill me-1 text-warning';
+                if (btnIcon) btnIcon.className = 'bi bi-sun-fill text-warning me-1';
             } else {
                 if (btnText) btnText.textContent = 'Dark';
                 if (btnIcon) btnIcon.className = 'bi bi-moon-stars-fill me-1';

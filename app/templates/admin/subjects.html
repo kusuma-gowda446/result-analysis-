@@ -6,20 +6,20 @@
 <div class="row g-4">
     <!-- Subject Catalog Table -->
     <div class="col-12 col-lg-7 col-xl-8">
-        <div class="card border-0 shadow-sm rounded-3 h-100">
-            <div class="card-header bg-transparent border-0 p-3 p-lg-4">
-                <h4 class="fw-bold mb-1 text-body-emphasis"><i class="bi bi-book-half text-primary me-2"></i> Academic Subject Catalog</h4>
-                <p class="text-muted small mb-0">Configure active course titles and maximum achievable internal/external marks.</p>
+        <div class="glass-card shadow-lg border-0 h-100 overflow-hidden">
+            <div class="glass-header p-4">
+                <h3 class="display-font fw-bold mb-1 text-white"><i class="bi bi-book-half text-warning me-2"></i> Course Catalog</h3>
+                <p class="text-white-50 small mb-0">Configure active course titles and maximum achievable internal/external marks.</p>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
+            <div class="p-0">
+                <div class="glass-table-wrapper border-0 rounded-0">
+                    <table class="glass-table">
+                        <thead>
                             <tr>
                                 <th class="ps-4">Order</th>
-                                <th>Subject Name</th>
+                                <th>Subject Title</th>
                                 <th class="text-center">Max Marks</th>
-                                <th class="text-end pe-4">Actions</th>
+                                <th class="text-end pe-4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -27,7 +27,7 @@
                             <tr>
                                 <td class="ps-4 font-monospace text-muted">#{{ sub.display_order }}</td>
                                 <td class="fw-bold text-body">{{ sub.name }}</td>
-                                <td class="text-center"><span class="badge bg-body-tertiary text-body border px-3 py-1 font-monospace fs-7">{{ sub.max_marks }} Marks</span></td>
+                                <td class="text-center"><span class="badge badge-amber font-monospace px-3 py-1 fs-8">{{ sub.max_marks }} Marks</span></td>
                                 <td class="text-end pe-4">
                                     <form action="{{ url_for('admin.delete_subject', sid=sub.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Deleting subject will also delete marks associated with it! Proceed?');">
                                         <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
@@ -50,33 +50,32 @@
 
     <!-- Add Subject Form -->
     <div class="col-12 col-lg-5 col-xl-4">
-        <div class="card border-0 shadow-sm rounded-3 h-100">
-            <div class="card-header bg-transparent border-0 p-3 p-lg-4">
-                <h5 class="fw-bold mb-1 text-body-emphasis"><i class="bi bi-plus-circle-fill text-success me-2"></i> Add New Subject</h5>
-                <p class="text-muted small mb-0">Register a new subject in the curriculum.</p>
+        <div class="glass-card shadow-lg border-0 h-100 p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary-subtle">
+                <h5 class="display-font fw-bold text-success mb-0">
+                    <i class="bi bi-plus-circle-fill me-2"></i> Add New Subject
+                </h5>
             </div>
-            <div class="card-body p-3 p-lg-4 pt-0">
-                <form action="{{ url_for('admin.add_subject') }}" method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label fw-semibold">Subject Title</label>
-                        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Operating Systems" required>
-                    </div>
+            <form action="{{ url_for('admin.add_subject') }}" method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Operating Systems" required>
+                    <label for="name">Subject Title</label>
+                </div>
 
-                    <div class="mb-3">
-                        <label for="max_marks" class="form-label fw-semibold">Maximum Marks</label>
-                        <input type="number" step="0.5" id="max_marks" name="max_marks" value="100" class="form-control" required>
-                    </div>
+                <div class="form-floating mb-3">
+                    <input type="number" step="0.5" id="max_marks" name="max_marks" value="100" class="form-control" placeholder="100" required>
+                    <label for="max_marks">Maximum Marks</label>
+                </div>
 
-                    <div class="mb-4">
-                        <label for="display_order" class="form-label fw-semibold">Display Order Sequence</label>
-                        <input type="number" id="display_order" name="display_order" value="{{ subjects|length + 1 }}" class="form-control" required>
-                    </div>
+                <div class="form-floating mb-4">
+                    <input type="number" id="display_order" name="display_order" value="{{ subjects|length + 1 }}" class="form-control" placeholder="1" required>
+                    <label for="display_order">Display Order Sequence</label>
+                </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold shadow-sm">
-                        <i class="bi bi-save me-1"></i> Save Subject
-                    </button>
-                </form>
-            </div>
+                <button type="submit" class="btn btn-glass-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+                    <i class="bi bi-save me-1"></i> Save Subject
+                </button>
+            </form>
         </div>
     </div>
 </div>

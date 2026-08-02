@@ -3,11 +3,11 @@
 {% block title %}Class Performance Analytics — SIET Tumakuru{% endblock %}
 
 {% block content %}
-<!-- Header Hero Card -->
-<div class="card bg-dark text-white border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-    <div class="card-body p-4 p-lg-5">
-        <span class="badge bg-info text-dark px-3 py-2 rounded-pill fw-bold mb-2"><i class="bi bi-graph-up-arrow me-1"></i> ACADEMIC INTELLIGENCE</span>
-        <h2 class="fw-bold text-white mb-2">Class Performance Analytics</h2>
+<!-- Glass Header Hero Banner -->
+<div class="glass-card shadow-lg border-0 overflow-hidden mb-4">
+    <div class="glass-header p-4 p-lg-5">
+        <span class="badge badge-amber px-3 py-2 rounded-pill font-monospace fs-8 mb-2"><i class="bi bi-graph-up-arrow me-1"></i> ACADEMIC INTELLIGENCE</span>
+        <h2 class="display-font text-white mb-1">Class Performance Analytics</h2>
         <p class="text-white-50 mb-0">Visual statistics detailing grade distributions, subject class averages, and top rank achievers.</p>
     </div>
 </div>
@@ -16,11 +16,11 @@
 <div class="row g-4 mb-4">
     <!-- Doughnut Chart for Grade Distribution -->
     <div class="col-12 col-lg-6">
-        <div class="card border-0 shadow-sm rounded-3 h-100">
-            <div class="card-header bg-transparent border-0 p-3 p-lg-4">
-                <h5 class="fw-bold mb-0 text-dark-emphasis"><i class="bi bi-pie-chart-fill text-primary me-2"></i> Overall Grade Distribution</h5>
+        <div class="glass-card shadow-lg border-0 h-100 p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary-subtle">
+                <h5 class="display-font fw-bold text-primary mb-0"><i class="bi bi-pie-chart-fill me-2"></i> Overall Grade Distribution</h5>
             </div>
-            <div class="card-body p-3 p-lg-4" style="min-height: 320px; position: relative;">
+            <div style="min-height: 320px; position: relative;">
                 <canvas id="gradeChart"></canvas>
             </div>
         </div>
@@ -28,11 +28,11 @@
 
     <!-- Bar Chart for Subject Performance -->
     <div class="col-12 col-lg-6">
-        <div class="card border-0 shadow-sm rounded-3 h-100">
-            <div class="card-header bg-transparent border-0 p-3 p-lg-4">
-                <h5 class="fw-bold mb-0 text-dark-emphasis"><i class="bi bi-bar-chart-fill text-success me-2"></i> Subject Class Averages</h5>
+        <div class="glass-card shadow-lg border-0 h-100 p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary-subtle">
+                <h5 class="display-font fw-bold text-success mb-0"><i class="bi bi-bar-chart-fill me-2"></i> Subject Class Averages</h5>
             </div>
-            <div class="card-body p-3 p-lg-4" style="min-height: 320px; position: relative;">
+            <div style="min-height: 320px; position: relative;">
                 <canvas id="subjectChart"></canvas>
             </div>
         </div>
@@ -40,14 +40,14 @@
 </div>
 
 <!-- Leaderboard Table Card -->
-<div class="card border-0 shadow-sm rounded-3">
-    <div class="card-header bg-transparent border-0 p-3 p-lg-4">
-        <h5 class="fw-bold mb-0 text-dark-emphasis"><i class="bi bi-trophy-fill text-warning me-2"></i> Top Performing Students Leaderboard</h5>
+<div class="glass-card shadow-lg border-0 overflow-hidden">
+    <div class="p-4 border-bottom border-secondary-subtle">
+        <h5 class="display-font fw-bold text-warning mb-0"><i class="bi bi-trophy-fill me-2"></i> Top Performing Students Leaderboard</h5>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-dark">
+    <div class="p-0">
+        <div class="glass-table-wrapper border-0 rounded-0">
+            <table class="glass-table">
+                <thead>
                     <tr>
                         <th class="ps-4">Rank</th>
                         <th>USN</th>

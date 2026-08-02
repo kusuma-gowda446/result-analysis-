@@ -21,16 +21,23 @@ class AnalyticsService:
             rpt = ReportService.build_student_report(s['usn'])
             if rpt:
                 all_reports.append(rpt)
-                grade = rpt['grade']
+                grade = rpt.get('grade', 'Fail')
                 if grade in grade_counts:
                     grade_counts[grade] += 1
+                else:
+                    grade_counts['Pass'] += 1
 
         subjects = SubjectModel.get_all()
         db = get_db()
         subject_stats = []
         for sub in subjects:
             sid = sub['id']
-            scores = [doc['score'] for doc in db.marks.find({'subject_id': int(sid)})]
+            # Match either integer or string subject_id
+            cursor = db.marks.find({'$or': [{'subject_id': sid}, {'subject_id': str(sid)}]})
+            scores = []
+            for doc in cursor:
+                val = doc.get('total', doc.get('score', doc.get('internal_marks', 0)))
+                scores.append(float(val) if val is not None else 0.0)
 
             avg_score = round(sum(scores) / len(scores), 2) if scores else 0.0
             max_score = max(scores) if scores else 0.0
@@ -44,13 +51,13 @@ class AnalyticsService:
                 'min_score': min_score
             })
 
-        all_reports.sort(key=lambda x: x['percentage'], reverse=True)
+        all_reports.sort(key=lambda x: x.get('percentage', 0), reverse=True)
         top_5 = [{
             'usn': r['usn'],
             'name': r['name'],
-            'total': r['total'],
-            'percentage': r['percentage'],
-            'grade': r['grade']
+            'total': r.get('total', 0),
+            'percentage': r.get('percentage', 0),
+            'grade': r.get('grade', 'Pass')
         } for r in all_reports[:5]]
 
         return {

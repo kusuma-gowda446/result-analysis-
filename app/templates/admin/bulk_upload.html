@@ -5,33 +5,33 @@
 {% block content %}
 <div class="row justify-content-center py-4">
     <div class="col-12 col-md-8 col-lg-6">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="card-header bg-dark text-white p-4 border-0 d-flex align-items-center justify-content-between">
+        <div class="glass-card shadow-lg border-0 overflow-hidden">
+            <div class="glass-header p-4 d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="badge bg-success px-3 py-1 rounded-pill mb-2"><i class="bi bi-file-earmark-excel-fill me-1"></i> BULK DATA ENGINE</span>
-                    <h4 class="fw-bold mb-0 text-white">Bulk Student Marks Import</h4>
+                    <span class="badge badge-emerald px-3 py-1 rounded-pill mb-2 fs-8"><i class="bi bi-file-earmark-excel-fill me-1"></i> BULK DATA ENGINE</span>
+                    <h4 class="display-font fw-bold mb-0 text-white">Bulk Student Marks Import</h4>
                 </div>
-                <a href="{{ url_for('admin.download_template') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                <a href="{{ url_for('admin.download_template') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold">
                     <i class="bi bi-download me-1"></i> CSV Template
                 </a>
             </div>
 
-            <div class="card-body p-4 p-sm-5">
+            <div class="p-4 p-sm-5">
                 <p class="text-muted mb-4">
                     Upload an Excel (<code>.xlsx</code>) or CSV (<code>.csv</code>) file containing student USNs, profile information, and subject marks. Existing records will be automatically updated.
                 </p>
 
                 <form action="{{ url_for('admin.bulk_upload') }}" method="POST" enctype="multipart/form-data">
-                    <div class="p-4 p-sm-5 text-center rounded-4 border border-2 border-dashed bg-body-tertiary mb-4">
+                    <div class="p-4 p-sm-5 text-center rounded-4 border border-2 border-dashed glass-card mb-4">
                         <i class="bi bi-cloud-arrow-up-fill text-success display-3 d-block mb-3"></i>
-                        <label for="file" class="form-label fw-bold text-body fs-5 mb-2 cursor-pointer">
+                        <label for="file" class="form-label fw-bold text-body fs-5 mb-2 cursor-pointer display-font">
                             Choose CSV or Excel Spreadsheet File
                         </label>
-                        <input class="form-control form-control-lg bg-body" type="file" id="file" name="file" accept=".csv, .xlsx, .xls" required>
+                        <input class="form-control form-control-lg" type="file" id="file" name="file" accept=".csv, .xlsx, .xls" required>
                         <small class="text-muted d-block mt-2">Supported formats: .xlsx, .xls, .csv (Max 10MB)</small>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold rounded-3 shadow-sm">
+                    <button type="submit" class="btn btn-glass-primary w-100 py-3 fw-bold rounded-pill shadow-sm">
                         <i class="bi bi-rocket-takeoff-fill me-2"></i> Process &amp; Import Spreadsheet
                     </button>
                 </form>

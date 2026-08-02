@@ -20,14 +20,14 @@ function renderGradeChart(gradeCounts) {
             datasets: [{
                 data: Object.values(gradeCounts),
                 backgroundColor: [
-                    '#10b981', // Distinction - Green
-                    '#3b82f6', // First Class - Blue
-                    '#f59e0b', // Second Class - Yellow
+                    '#10b981', // Distinction - Emerald
+                    '#2563eb', // First Class - Royal Blue
+                    '#f59e0b', // Second Class - Amber
                     '#8b5cf6', // Pass - Purple
-                    '#ef4444'  // Fail - Red
+                    '#ef4444'  // Fail - Crimson
                 ],
                 borderWidth: 2,
-                borderColor: '#ffffff'
+                borderColor: 'transparent'
             }]
         },
         options: {
@@ -56,14 +56,14 @@ function renderSubjectChart(subjectStats) {
                 {
                     label: 'Class Average',
                     data: avgScores,
-                    backgroundColor: '#1d4ed8',
-                    borderRadius: 4
+                    backgroundColor: '#2563eb',
+                    borderRadius: 6
                 },
                 {
                     label: 'Max Possible Marks',
                     data: maxScores,
-                    backgroundColor: '#e2e8f0',
-                    borderRadius: 4
+                    backgroundColor: 'rgba(148, 163, 184, 0.25)',
+                    borderRadius: 6
                 }
             ]
         },
@@ -87,12 +87,16 @@ function renderTopPerformersTable(topPerformers) {
     tbody.innerHTML = '';
     topPerformers.forEach((student, index) => {
         const tr = document.createElement('tr');
+        let badgeClass = 'badge-emerald';
+        if (student.grade === 'Fail') badgeClass = 'badge-crimson';
+        else if (student.grade === 'Second Class' || student.grade === 'Pass') badgeClass = 'badge-amber';
+
         tr.innerHTML = `
-            <td><strong>#${index + 1}</strong></td>
-            <td>${student.usn}</td>
-            <td>${student.name}</td>
-            <td><strong>${student.percentage}%</strong> (${student.total} marks)</td>
-            <td><span class="badge badge-${student.grade.toLowerCase().replace(' ', '')}">${student.grade}</span></td>
+            <td class="ps-4"><strong>#${index + 1}</strong></td>
+            <td><span class="badge badge-amber font-monospace">${student.usn}</span></td>
+            <td class="fw-bold text-body">${student.name}</td>
+            <td class="text-center font-monospace"><strong>${student.percentage}%</strong> (${student.total} marks)</td>
+            <td class="text-center pe-4"><span class="badge ${badgeClass} px-3 py-1 rounded-pill fs-8">${student.grade}</span></td>
         `;
         tbody.appendChild(tr);
     });
