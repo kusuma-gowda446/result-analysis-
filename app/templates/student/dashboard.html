@@ -1,56 +1,109 @@
 {% extends 'base.html' %}
 
-{% block title %}Student Dashboard — Shridevi Institute{% endblock %}
+{% block title %}Student Dashboard — {{ student.name if student else username }}{% endblock %}
 
 {% block content %}
-<div class="glass-hero mb-4">
-    <h1>Welcome, {{ username }}!</h1>
-    <p>View your semester academic results, internal and external marks breakdown, SGPA, and CGPA.</p>
+<!-- Welcome Banner -->
+<div class="glass-card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="color: white; font-size: 1.8rem; font-weight: 700; margin: 0;">Welcome, {{ student.name if student else username }} 👋</h1>
+        <p style="opacity: 0.85; margin-top: 6px; margin-bottom: 0;">USN: <strong>{{ student.usn if student else session.get('student_usn') }}</strong> | Department of {{ student.department if student else 'AI & Data Science' }}</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        {% if student %}
+        <a href="{{ url_for('student.download_pdf', usn=student.usn) }}" class="btn btn-primary" style="background: var(--accent-blue); border: none; font-weight: 600;">
+            📥 Download Result as PDF
+        </a>
+        {% endif %}
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.3);">
+            🚪 Logout
+        </a>
+    </div>
 </div>
 
 {% if student %}
-<!-- Academic Performance Summary Cards -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-    <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid var(--primary-navy);">
-        <div class="text-muted small">Semester</div>
-        <div style="font-size: 1.5rem; font-weight: 700;">Sem {{ student.semester }}</div>
+<!-- Academic Summary Cards (Semester Results, SGPA, CGPA) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div class="glass-card" style="padding: 20px; text-align: center; border-left: 4px solid var(--primary-navy); background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+        <div class="text-muted small" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Semester</div>
+        <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-navy); margin-top: 4px;">Sem {{ student.semester }}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">Section {{ student.section }}</div>
     </div>
-    <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid var(--accent-blue);">
-        <div class="text-muted small">Total Marks</div>
-        <div style="font-size: 1.5rem; font-weight: 700;">{{ student.total }} / {{ student.max_total }}</div>
+    <div class="glass-card" style="padding: 20px; text-align: center; border-left: 4px solid var(--accent-blue); background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+        <div class="text-muted small" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Score</div>
+        <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent-blue); margin-top: 4px;">{{ student.total }} / {{ student.max_total }}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">Percentage: {{ student.percentage }}%</div>
     </div>
-    <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">
-        <div class="text-muted small">Result</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">{{ student.result }}</div>
+    <div class="glass-card" style="padding: 20px; text-align: center; border-left: 4px solid {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+        <div class="text-muted small" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Semester Result</div>
+        <div style="font-size: 1.8rem; font-weight: 700; color: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; margin-top: 4px;">{{ student.result }}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">Grade: {{ student.grade }}</div>
     </div>
-    <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid #8b5cf6;">
-        <div class="text-muted small">SGPA</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{ student.sgpa }}</div>
+    <div class="glass-card" style="padding: 20px; text-align: center; border-left: 4px solid #8b5cf6; background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+        <div class="text-muted small" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">SGPA</div>
+        <div style="font-size: 1.8rem; font-weight: 700; color: #8b5cf6; margin-top: 4px;">{{ student.sgpa }}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">Semester Grade Point</div>
     </div>
-    <div class="glass-card" style="padding: 16px; text-align: center; border-left: 4px solid #ec4899;">
-        <div class="text-muted small">CGPA</div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #ec4899;">{{ student.cgpa }}</div>
+    <div class="glass-card" style="padding: 20px; text-align: center; border-left: 4px solid #ec4899; background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+        <div class="text-muted small" style="text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">CGPA</div>
+        <div style="font-size: 1.8rem; font-weight: 700; color: #ec4899; margin-top: 4px;">{{ student.cgpa }}</div>
+        <div style="font-size: 0.8rem; color: #64748b;">Cumulative Grade Point</div>
     </div>
 </div>
 
-<div class="card" style="margin-bottom: 32px;">
-    <div class="card-header">
-        <h2>🎓 Academic Performance Report</h2>
-        <a href="{{ url_for('student.download_pdf', usn=student.usn) }}" class="btn btn-primary">
-            📥 Download Official PDF Report
+<!-- Student Profile & Personal Information Card -->
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>👤 Personal Profile Information</h2>
+        <span class="badge badge-success" style="background: #e0e7ff; color: #3730a3; padding: 6px 12px; font-size: 0.85rem; font-weight: 600;">Official Student Record</span>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; background: #f8fafc; padding: 24px; border-radius: var(--radius-sm); border: 1px solid #e2e8f0;">
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">1. University Seat Number (USN)</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.usn }}</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">2. Student Full Name</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.name }}</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">3. Date of Birth</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.dob or '-' }}</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">4. Department</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.department }}</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">5. Semester & Section</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">Sem {{ student.semester }} (Section {{ student.section }})</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">6. Phone Number</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.phone or '-' }}</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">7. Email Address</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.email or '-' }}</strong>
+            </div>
+            <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">8. Residential Address</span>
+                <strong style="font-size: 1rem; color: var(--primary-navy);">{{ student.address or '-' }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subject-wise Marks Table -->
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>📚 Subject-wise Marks Breakdown (Semester {{ student.semester }})</h2>
+        <a href="{{ url_for('student.download_pdf', usn=student.usn) }}" class="btn btn-secondary btn-sm">
+            📥 Download PDF
         </a>
     </div>
     <div class="card-body">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: var(--radius-sm);">
-            <div><strong>Student Name:</strong> {{ student.name }}</div>
-            <div><strong>USN:</strong> {{ student.usn }}</div>
-            <div><strong>Department:</strong> {{ student.department }}</div>
-            <div><strong>Semester:</strong> Sem {{ student.semester }} (Sec {{ student.section }})</div>
-            <div><strong>Date of Birth:</strong> {{ student.dob or '-' }}</div>
-            <div><strong>Overall Result:</strong> <strong style="color: {% if student.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %};">{{ student.result }}</strong></div>
-        </div>
-
-        <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--primary-navy);">Subject Marks Breakdown</h3>
         <div class="table-responsive">
             <table class="data-table">
                 <thead>
@@ -75,7 +128,7 @@
                         <td><strong>{{ sub.total }}</strong></td>
                         <td>{{ sub.max }}</td>
                         <td>
-                            <span class="badge" style="padding: 4px 8px; border-radius: 4px; color: white; background: {% if sub.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; font-weight: 600;">
+                            <span class="badge" style="padding: 4px 10px; border-radius: 4px; color: white; background: {% if sub.result == 'PASS' %}#10b981{% else %}#ef4444{% endif %}; font-weight: 600;">
                                 {{ sub.result }}
                             </span>
                         </td>
@@ -83,7 +136,7 @@
                     </tr>
                     {% endfor %}
                     <tr style="background: #f1f5f9; font-weight: bold;">
-                        <td colspan="2">GRAND TOTAL / ACADEMIC OVERVIEW</td>
+                        <td colspan="2">GRAND TOTAL / OVERALL SUMMARY</td>
                         <td>{{ student.total_internal }}</td>
                         <td>{{ student.total_external }}</td>
                         <td>{{ student.total }}</td>
@@ -96,6 +149,17 @@
         </div>
     </div>
 </div>
+
+<!-- Bottom Action Bar -->
+<div style="display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 32px;">
+    <a href="{{ url_for('student.download_pdf', usn=student.usn) }}" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">
+        📥 Download Official PDF Result Sheet
+    </a>
+    <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem;">
+        🚪 Logout
+    </a>
+</div>
+
 {% else %}
 <div class="card" style="max-width: 600px; margin: 0 auto;">
     <div class="card-header">
