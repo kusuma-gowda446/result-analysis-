@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Spreadsheet Upload{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 650px; margin: 0 auto;">
+    <div class="card-header">
+        <h2>📁 Bulk Student Marks Import</h2>
+        <a href="{{ url_for('admin.download_template') }}" class="btn btn-secondary btn-sm">
+            📥 Download CSV Template
+        </a>
+    </div>
+    <div class="card-body">
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">
+            Upload a CSV or Excel spreadsheet containing student USNs, profiles, and subject scores. Existing USN records will be automatically updated with new marks.
+        </p>
+
+        <form action="{{ url_for('admin.bulk_upload') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group" style="border: 2px dashed var(--border-color); padding: 32px; text-align: center; border-radius: var(--radius-md); background: #fafafa;">
+                <div style="font-size: 2.5rem; margin-bottom: 8px;">📄</div>
+                <label for="file" style="cursor: pointer; display: block; margin-bottom: 12px;">
+                    <strong>Click to select CSV or XLSX file</strong>
+                </label>
+                <input type="file" id="file" name="file" accept=".csv, .xlsx, .xls" required style="margin: 0 auto; display: block;">
+            </div>
+
+            <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; margin-top: 16px; font-size: 1rem;">
+                🚀 Process & Import Spreadsheet
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

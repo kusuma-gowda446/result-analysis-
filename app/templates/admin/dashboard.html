@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="glass-hero">
+    <h1>Faculty & Admin Management Console</h1>
+    <p>Manage student records, edit subject criteria, manage user roles, run bulk data imports, and inspect visual analytics.</p>
+</div>
+
+<!-- Quick Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">🎓</div>
+        <div class="stat-info">
+            <h4>Total Enrolled Students</h4>
+            <div class="stat-number">{{ total_students }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon green">📚</div>
+        <div class="stat-info">
+            <h4>Active Subjects</h4>
+            <div class="stat-number">{{ total_subjects }}</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon purple">👥</div>
+        <div class="stat-info">
+            <h4>System User Accounts</h4>
+            <div class="stat-number">{{ total_users }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Quick Actions & Recent Students -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- Recent Students Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Recent Student Records</h3>
+            <a href="{{ url_for('admin.all_students') }}" class="btn btn-secondary btn-sm">View All Students →</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>USN</th>
+                            <th>Name</th>
+                            <th>Semester</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in recent_students %}
+                        <tr>
+                            <td><strong>{{ s.usn }}</strong></td>
+                            <td>{{ s.name }}</td>
+                            <td>Sem {{ s.semester }} ({{ s.year }})</td>
+                            <td>
+                                <a href="{{ url_for('admin.edit_student', usn=s.usn) }}" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" style="text-align: center;">No students added yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Shortcuts Card -->
+    <div class="card">
+        <div class="card-header">
+            <h3>⚡ Quick Management</h3>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
+            <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary" style="justify-content: flex-start;">
+                ➕ Add New Student & Marks
+            </a>
+            <a href="{{ url_for('admin.bulk_upload') }}" class="btn btn-success" style="justify-content: flex-start;">
+                📁 Bulk Spreadsheet Import
+            </a>
+            <a href="{{ url_for('admin.manage_subjects') }}" class="btn btn-secondary" style="justify-content: flex-start;">
+                📚 Manage Subjects & Max Marks
+            </a>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-secondary" style="justify-content: flex-start;">
+                👥 Manage User Login Accounts
+            </a>
+            <a href="{{ url_for('analytics.index') }}" class="btn btn-primary" style="justify-content: flex-start; background: #3b82f6;">
+                📈 View Class Analytics & Charts
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

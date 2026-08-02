@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="glass-hero">
+    <h1>Welcome, {{ username }}!</h1>
+    <p>Access your academic performance, subject-wise internal assessment marks, and download official progress reports.</p>
+</div>
+
+{% if student %}
+<!-- Assigned Student Summary Card -->
+<div class="card" style="margin-bottom: 32px;">
+    <div class="card-header">
+        <h2>🎓 Academic Profile Overview</h2>
+        <a href="{{ url_for('student.download_pdf', usn=student.usn) }}" class="btn btn-primary">
+            📥 Download Official PDF Report
+        </a>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: var(--radius-sm);">
+            <div><strong>Student Name:</strong> {{ student.name }}</div>
+            <div><strong>USN:</strong> {{ student.usn }}</div>
+            <div><strong>Programme:</strong> {{ student.department }}</div>
+            <div><strong>Semester:</strong> {{ student.semester }}</div>
+            <div><strong>Academic Year:</strong> {{ student.year }}</div>
+            <div>
+                <strong>Overall Performance:</strong> 
+                <span class="badge badge-{{ student.grade.lower().replace(' ', '') }}">{{ student.grade }}</span>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 16px; font-size: 1.1rem;">Subject Marks Breakdown</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Sl.</th>
+                        <th>Subject Title</th>
+                        <th>Max Marks</th>
+                        <th>Marks Obtained</th>
+                        <th>Attendance</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in student.subjects %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ sub.name }}</strong></td>
+                        <td>{{ sub.max }}</td>
+                        <td><strong>{{ sub.score }}</strong></td>
+                        <td>{{ sub.attendance }}</td>
+                        <td><span class="badge badge-firstclass">{{ sub.remark }}</span></td>
+                    </tr>
+                    {% endfor %}
+                    <tr style="background: #f1f5f9; font-weight: bold;">
+                        <td colspan="2">GRAND TOTAL</td>
+                        <td>{{ student.max_total }}</td>
+                        <td>{{ student.total }} ({{ student.percentage }}%)</td>
+                        <td colspan="2">Grade: {{ student.grade }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Admin or User without pre-assigned USN Search Box -->
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+        <h2>🔍 Search Student Academic Report</h2>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('student.search') }}" method="POST">
+            <div class="form-group">
+                <label for="usn">University Seat Number (USN)</label>
+                <input type="text" id="usn" name="usn" class="form-control" placeholder="Enter USN (e.g., 1SG24AI001)" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                🔍 Search Report
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

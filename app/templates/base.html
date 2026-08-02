@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Result Management System{% endblock %} — Shridevi Institute</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Top Notice Bar -->
+    <div class="top-notice-bar">
+        Affiliated to Visvesvaraya Technological University (VTU), Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A+
+    </div>
+
+    <!-- Official Institution Header -->
+    <header class="official-header">
+        <div class="header-container">
+            <div class="brand-seal">
+                <span>✦</span>
+                SHRIDEVI<br>INSTITUTE<br>EST. 1999
+            </div>
+            
+            <div class="college-details">
+                <div class="affil-tag">Affiliated to Visvesvaraya Technological University (VTU), Belagavi</div>
+                <h1>Shridevi Institute of Engineering and Technology</h1>
+                <div class="meta-info">
+                    Sira Road, Tumakuru – 572 106, Karnataka &nbsp;|&nbsp; ☎ 0816-225800 &nbsp;|&nbsp; ✉ info@shrideviiet.ac.in
+                </div>
+            </div>
+
+            <div class="badge-naac">
+                NAAC<br>ACCREDITED
+                <div class="grade">A+</div>
+                GRADE
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Strip -->
+    <nav class="main-nav">
+        <div class="nav-wrapper">
+            <ul class="nav-links">
+                {% if session.get('role') == 'admin' %}
+                    <li><a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">📊 Admin Overview</a></li>
+                    <li><a href="{{ url_for('admin.all_students') }}" class="{% if request.endpoint == 'admin.all_students' %}active{% endif %}">🎓 Students</a></li>
+                    <li><a href="{{ url_for('admin.manage_subjects') }}" class="{% if request.endpoint == 'admin.manage_subjects' %}active{% endif %}">📚 Subjects</a></li>
+                    <li><a href="{{ url_for('admin.users') }}" class="{% if request.endpoint == 'admin.users' %}active{% endif %}">👥 Accounts</a></li>
+                    <li><a href="{{ url_for('admin.bulk_upload') }}" class="{% if request.endpoint == 'admin.bulk_upload' %}active{% endif %}">📁 Bulk Import</a></li>
+                    <li><a href="{{ url_for('analytics.index') }}" class="{% if request.endpoint == 'analytics.index' %}active{% endif %}">📈 Analytics</a></li>
+                {% elif session.get('role') == 'student' %}
+                    <li><a href="{{ url_for('student.dashboard') }}" class="{% if request.endpoint == 'student.dashboard' %}active{% endif %}">🏠 My Dashboard</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}" class="active">🔑 Login</a></li>
+                {% endif %}
+            </ul>
+
+            {% if session.get('user_id') %}
+            <div class="user-profile-menu">
+                <div class="user-badge">
+                    <span>👤 <strong>{{ session.get('username') }}</strong></span>
+                    <span class="user-role-tag">{{ session.get('role') }}</span>
+                </div>
+                <button onclick="openModal('passwordModal')" class="btn btn-secondary btn-sm">🔑 Change Password</button>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-sm">🚪 Logout</a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- App Container -->
+    <main class="app-container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }}">
+                <span>{{ msg }}</span>
+                <button class="alert-close">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Password Modal -->
+    {% if session.get('user_id') %}
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-card">
+            <div class="card-header">
+                <h3>🔑 Change Password</h3>
+                <button onclick="closeModal('passwordModal')" class="btn btn-secondary btn-sm">&times;</button>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('auth.change_password') }}" method="POST">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" name="current_password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="new_password" class="form-control" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-control" required minlength="6">
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" onclick="closeModal('passwordModal')" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2024–25 Shridevi Institute of Engineering and Technology, Tumakuru<br>
+        <span>Affiliated to VTU, Belagavi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; NAAC Accredited A+</span>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

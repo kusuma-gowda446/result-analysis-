@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage User Accounts{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- User List Table -->
+    <div class="card">
+        <div class="card-header">
+            <h2>👥 Registered User Accounts</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Linked Student USN</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td><strong>{{ u.username }}</strong></td>
+                            <td>
+                                <span class="badge {% if u.role == 'admin' %}badge-distinction{% else %}badge-firstclass{% endif %}">
+                                    {{ u.role }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if u.student_usn %}
+                                    {{ u.student_usn }} ({{ u.student_name or 'N/A' }})
+                                {% else %}
+                                    <span style="color: var(--text-muted);">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if u.id != session.get('user_id') %}
+                                <form action="{{ url_for('admin.delete_user', uid=u.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete user {{ u.username }}?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                                </form>
+                                {% else %}
+                                <span class="badge badge-pass">Current Session</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3>➕ Create User Account</h3>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('admin.users') }}" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="e.g. 1SG24AI001 or faculty1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role Permission</label>
+                    <select id="role" name="role" class="form-control">
+                        <option value="student">Student</option>
+                        <option value="admin">Administrator / Faculty</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="student_usn">Link to Student USN (Optional)</label>
+                    <select id="student_usn" name="student_usn" class="form-control">
+                        <option value="">-- None (General User / Admin) --</option>
+                        {% for s in students %}
+                        <option value="{{ s.usn }}">{{ s.usn }} - {{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

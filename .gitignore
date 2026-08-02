@@ -1,5 +1,7 @@
 # Database (contains sensitive login/student data - don't push to GitHub)
 database.db
+instance/
+*.db
 
 # Python cache
 __pycache__/

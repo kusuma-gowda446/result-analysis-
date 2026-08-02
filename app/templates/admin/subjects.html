@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Subjects{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- Subject List Table -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📚 Course & Subject Criteria</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Subject Name</th>
+                            <th>Max Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in subjects %}
+                        <tr>
+                            <td>#{{ sub.display_order }}</td>
+                            <td><strong>{{ sub.name }}</strong></td>
+                            <td>{{ sub.max_marks }} marks</td>
+                            <td>
+                                <form action="{{ url_for('admin.delete_subject', sid=sub.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Deleting subject will also delete marks associated with it! Proceed?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" style="text-align: center; padding: 24px;">No subjects defined yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subject Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3>➕ Add New Subject</h3>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('admin.add_subject') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">Subject Title</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="e.g., Computer Networks" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="max_marks">Maximum Marks</label>
+                    <input type="number" step="0.5" id="max_marks" name="max_marks" value="15" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="display_order">Display Order</label>
+                    <input type="number" id="display_order" name="display_order" value="{{ subjects|length + 1 }}" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Save Subject
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
