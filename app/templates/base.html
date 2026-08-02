@@ -115,7 +115,7 @@
                     <button class="btn btn-secondary btn-sm dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3" type="button" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle fs-6"></i>
                         <span>{{ session.get('username') }}</span>
-                        <span class="badge bg-warning text-dark">{{ session.get('role') | uppercase }}</span>
+                        <span class="badge bg-warning text-dark">{{ session.get('role') | upper if session.get('role') else '' }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-key me-2"></i>Change Password</a></li>

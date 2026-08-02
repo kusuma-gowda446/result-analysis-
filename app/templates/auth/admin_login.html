@@ -3,38 +3,39 @@
 {% block title %}Faculty & Admin Login — SIET Tumakuru{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center py-5">
+<div class="row justify-content-center align-items-center py-4 py-md-5">
     <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
         <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-dark text-white text-center py-4 border-0 position-relative">
+            <!-- High Contrast Gradient Header -->
+            <div class="card-header text-white text-center py-4 border-0" style="background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 100%);">
                 <div class="mb-2">
-                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-7 fw-semibold">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-7 fw-bold">
                         <i class="bi bi-shield-lock-fill me-1"></i> FACULTY &amp; ADMIN PORTAL
                     </span>
                 </div>
-                <h3 class="fw-bold mb-1">Administrative Sign In</h3>
+                <h3 class="fw-bold text-white mb-1">Administrative Sign In</h3>
                 <p class="text-white-50 small mb-0">Secure Portal Access for Academic Staff</p>
             </div>
 
             <div class="card-body p-4 p-sm-5">
                 <form action="{{ url_for('auth.admin_login') }}" method="POST">
                     <div class="mb-3">
-                        <label for="username" class="form-label fw-medium text-secondary">
+                        <label for="username" class="form-label fw-bold text-dark-emphasis">
                             <i class="bi bi-person-fill text-primary me-1"></i> Username
                         </label>
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                            <input type="text" id="username" name="username" class="form-control bg-light border-start-0" placeholder="Enter admin username" required autofocus>
+                            <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" id="username" name="username" class="form-control border-start-0" placeholder="Enter admin username" required autofocus>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="password" class="form-label fw-medium text-secondary">
+                        <label for="password" class="form-label fw-bold text-dark-emphasis">
                             <i class="bi bi-lock-fill text-primary me-1"></i> Password
                         </label>
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
-                            <input type="password" id="password" name="password" class="form-control bg-light border-start-0" placeholder="Enter password" required>
+                            <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-key text-muted"></i></span>
+                            <input type="password" id="password" name="password" class="form-control border-start-0" placeholder="Enter password" required>
                         </div>
                     </div>
 
@@ -44,14 +45,16 @@
                 </form>
 
                 <div class="text-center mt-3 pt-3 border-top">
-                    <a href="{{ url_for('auth.student_login') }}" class="text-decoration-none small text-muted">
-                        <i class="bi bi-mortarboard-fill text-warning me-1"></i> Student Portal Login →
+                    <a href="{{ url_for('auth.student_login') }}" class="text-decoration-none fw-semibold text-primary">
+                        <i class="bi bi-mortarboard-fill me-1"></i> Student Portal Login →
                     </a>
                 </div>
             </div>
 
-            <div class="card-footer bg-light text-center py-3 border-0">
-                <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Default Admin Credentials: <strong>admin</strong> / <strong>admin123</strong></small>
+            <div class="card-footer bg-body-tertiary text-center py-3 border-0">
+                <div class="alert alert-info border-0 mb-0 py-2 px-3 small text-dark d-inline-block rounded-pill">
+                    <i class="bi bi-key-fill text-primary me-1"></i> Default Admin Credentials: <strong class="text-dark font-monospace ms-1">admin / admin123</strong>
+                </div>
             </div>
         </div>
     </div>
