@@ -1,6 +1,6 @@
 from app.models.student import StudentModel
 from app.models.subject import SubjectModel
-from app.database.connection import get_db
+from app.database.connection import get_db, is_mongo
 from app.utils.pdf_generator import generate_pdf_report
 
 class ReportService:
@@ -9,24 +9,30 @@ class ReportService:
         row = StudentModel.get_by_usn(usn)
         if not row:
             return None
+        row = dict(row)
             
         subjects_db = SubjectModel.get_all()
-        conn = get_db()
+        db = get_db()
         
         subjects_out = []
         grand_total = 0
         max_total   = 0
         
         for sub in subjects_db:
-            mark = conn.execute(
-                "SELECT * FROM student_marks WHERE student_usn=? AND subject_id=?",
-                (usn, sub['id'])
-            ).fetchone()
+            sid = sub['id']
+            if is_mongo(db):
+                mark = db.student_marks.find_one({'student_usn': usn, 'subject_id': int(sid)})
+            else:
+                mark = db.execute(
+                    "SELECT * FROM student_marks WHERE student_usn=? AND subject_id=?",
+                    (usn, sid)
+                ).fetchone()
+                
             score = mark['score'] if mark else 0
             grand_total += score
             max_total   += sub['max_marks']
             subjects_out.append({
-                'id':         sub['id'],
+                'id':         sid,
                 'name':       sub['name'],
                 'score':      score,
                 'attendance': mark['attendance'] if mark else '-',
@@ -52,8 +58,8 @@ class ReportService:
             'usn':        row['usn'],
             'semester':   row['semester'],
             'year':       row['year'],
-            'department': row['department'] if 'department' in row.keys() else 'AI & Data Science',
-            'email':      row['email'] if 'email' in row.keys() else '-',
+            'department': row.get('department', 'AI & Data Science'),
+            'email':      row.get('email', '-'),
             'subjects':   subjects_out,
             'total':      grand_total,
             'max_total':  max_total,

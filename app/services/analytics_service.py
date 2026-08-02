@@ -1,7 +1,7 @@
 from app.models.student import StudentModel
 from app.models.subject import SubjectModel
 from app.services.report_service import ReportService
-from app.database.connection import get_db
+from app.database.connection import get_db, is_mongo
 
 class AnalyticsService:
     @staticmethod
@@ -26,16 +26,19 @@ class AnalyticsService:
                     grade_counts[grade] += 1
 
         subjects = SubjectModel.get_all()
-        conn = get_db()
+        db = get_db()
         subject_stats = []
         for sub in subjects:
-            scores = conn.execute(
-                "SELECT score FROM student_marks WHERE subject_id=?", (sub['id'],)
-            ).fetchall()
-            val_list = [r['score'] for r in scores]
-            avg_score = round(sum(val_list) / len(val_list), 2) if val_list else 0.0
-            max_score = max(val_list) if val_list else 0.0
-            min_score = min(val_list) if val_list else 0.0
+            sid = sub['id']
+            if is_mongo(db):
+                scores = [doc['score'] for doc in db.student_marks.find({'subject_id': int(sid)})]
+            else:
+                rows = db.execute("SELECT score FROM student_marks WHERE subject_id=?", (sid,)).fetchall()
+                scores = [r['score'] for r in rows]
+
+            avg_score = round(sum(scores) / len(scores), 2) if scores else 0.0
+            max_score = max(scores) if scores else 0.0
+            min_score = min(scores) if scores else 0.0
             
             subject_stats.append({
                 'name': sub['name'],
