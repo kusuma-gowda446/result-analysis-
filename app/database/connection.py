@@ -1,7 +1,4 @@
-import os
-import sqlite3
 from flask import current_app, g
-import pymongo
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash
 
@@ -13,127 +10,57 @@ DEFAULT_SUBJECTS = [
     {"id": 5, "name": "Python for DS",   "max_marks": 15.0, "display_order": 5},
 ]
 
-def is_mongo(db):
-    return isinstance(db, pymongo.database.Database)
-
 def get_db():
     if 'db' not in g:
-        is_testing = current_app.config.get('TESTING', False)
-        mongo_uri = current_app.config.get('MONGO_URI') or 'mongodb://mongodb:27017/marks_analyser'
+        mongo_uri = current_app.config.get('MONGO_URI') or 'mongodb://localhost:27017/marks_analyser'
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
         
-        if not (is_testing and 'mongodb://' in mongo_uri):
-            try:
-                timeout = 100 if is_testing else 1000
-                client = MongoClient(mongo_uri, serverSelectionTimeoutMS=timeout)
-                client.admin.command('ping')
-                db_name = mongo_uri.rstrip('/').split('/')[-1] or 'marks_analyser'
-                g.mongo_client = client
-                g.db = client[db_name]
-                return g.db
-            except Exception:
-                pass
-
-        db_path = current_app.config['DATABASE_PATH']
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        g.db = sqlite3.connect(db_path)
-        g.db.row_factory = sqlite3.Row
-        g.db.execute("PRAGMA foreign_keys = ON")
+        # Determine target database name (e.g. marks_analyser or marks_analyser_test)
+        db_name = 'marks_analyser_test' if current_app.config.get('TESTING') else 'marks_analyser'
+        g.mongo_client = client
+        g.db = client[db_name]
     return g.db
 
 def close_db(e=None):
-    db = g.pop('db', None)
-    if db is not None and isinstance(db, sqlite3.Connection):
-        db.close()
     client = g.pop('mongo_client', None)
     if client is not None:
         client.close()
 
 def init_db(app=None):
-    db_path = app.config['DATABASE_PATH'] if app else current_app.config['DATABASE_PATH']
-    mongo_uri = (app.config.get('MONGO_URI') if app else current_app.config.get('MONGO_URI')) or 'mongodb://mongodb:27017/marks_analyser'
+    mongo_uri = (app.config.get('MONGO_URI') if app else current_app.config.get('MONGO_URI')) or 'mongodb://localhost:27017/marks_analyser'
     is_testing = app.config.get('TESTING') if app else current_app.config.get('TESTING', False)
+    db_name = 'marks_analyser_test' if is_testing else 'marks_analyser'
+    
+    try:
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
+        db = client[db_name]
 
-    if not is_testing:
-        try:
-            client = MongoClient(mongo_uri, serverSelectionTimeoutMS=1000)
-            client.admin.command('ping')
-            db_name = mongo_uri.rstrip('/').split('/')[-1] or 'marks_analyser'
-            mdb = client[db_name]
-            
-            mdb.users.create_index('username', unique=True)
-            mdb.students.create_index('usn', unique=True)
-            mdb.subjects.create_index('id', unique=True)
-            mdb.student_marks.create_index([('student_usn', 1), ('subject_id', 1)], unique=True)
-            
-            if not mdb.users.find_one({'username': 'admin'}):
-                mdb.users.insert_one({
-                    'id': 1,
-                    'username': 'admin',
-                    'password': generate_password_hash('admin123'),
-                    'role': 'admin',
-                    'student_usn': None
-                })
-                
-            if mdb.subjects.count_documents({}) == 0:
-                mdb.subjects.insert_many(DEFAULT_SUBJECTS)
-                
-            client.close()
-            return
-        except Exception:
-            pass
+        # 1. Collection 'admins'
+        db.admins.create_index('username', unique=True)
 
-    # Fallback to SQLite initialization
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
+        # 2. Collection 'students'
+        db.students.create_index('usn', unique=True)
 
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        username    TEXT UNIQUE NOT NULL,
-        password    TEXT NOT NULL,
-        role        TEXT NOT NULL DEFAULT "student",
-        student_usn TEXT DEFAULT NULL,
-        created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_usn) REFERENCES students(usn) ON DELETE SET NULL
-    )''')
+        # 3. Collection 'marks'
+        db.marks.create_index([('student_usn', 1), ('subject_id', 1)], unique=True)
 
-    c.execute('''CREATE TABLE IF NOT EXISTS students (
-        id         INTEGER PRIMARY KEY AUTOINCREMENT,
-        usn        TEXT UNIQUE NOT NULL,
-        name       TEXT NOT NULL,
-        semester   TEXT DEFAULT "3",
-        year       TEXT DEFAULT "2024-25",
-        department TEXT DEFAULT "AI & Data Science",
-        email      TEXT DEFAULT "-"
-    )''')
+        # 4. Collection 'subjects'
+        db.subjects.create_index('id', unique=True)
 
-    c.execute('''CREATE TABLE IF NOT EXISTS subjects (
-        id            INTEGER PRIMARY KEY AUTOINCREMENT,
-        name          TEXT NOT NULL,
-        max_marks     REAL DEFAULT 15,
-        display_order INTEGER DEFAULT 0
-    )''')
+        # Seed default admin user in 'admins' collection
+        if not db.admins.find_one({'username': 'admin'}):
+            db.admins.insert_one({
+                'id': 1,
+                'username': 'admin',
+                'password': generate_password_hash('admin123'),
+                'role': 'admin',
+                'student_usn': None
+            })
 
-    c.execute('''CREATE TABLE IF NOT EXISTS student_marks (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_usn TEXT NOT NULL,
-        subject_id  INTEGER NOT NULL,
-        score       REAL DEFAULT 0,
-        attendance  TEXT DEFAULT "-",
-        remark      TEXT DEFAULT "-",
-        FOREIGN KEY (student_usn) REFERENCES students(usn) ON DELETE CASCADE,
-        FOREIGN KEY (subject_id)  REFERENCES subjects(id)  ON DELETE CASCADE,
-        UNIQUE (student_usn, subject_id)
-    )''')
+        # Seed default subjects
+        if db.subjects.count_documents({}) == 0:
+            db.subjects.insert_many(DEFAULT_SUBJECTS)
 
-    if not c.execute("SELECT 1 FROM users WHERE username='admin'").fetchone():
-        c.execute("INSERT INTO users (username,password,role) VALUES (?,?,?)",
-                  ('admin', generate_password_hash('admin123'), 'admin'))
-
-    if not c.execute("SELECT 1 FROM subjects").fetchone():
-        c.executemany("INSERT INTO subjects (name,max_marks,display_order) VALUES (?,?,?)",
-                      [(s['name'], s['max_marks'], s['display_order']) for s in DEFAULT_SUBJECTS])
-
-    conn.commit()
-    conn.close()
+        client.close()
+    except Exception as err:
+        print(f"MongoDB connection/initialization info: {err}")

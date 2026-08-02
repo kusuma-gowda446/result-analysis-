@@ -14,6 +14,12 @@ def client():
         with app.app_context():
             init_db(app)
         yield client
+        with app.app_context():
+            db = get_db()
+            db.admins.drop()
+            db.students.drop()
+            db.marks.drop()
+            db.subjects.drop()
 
 def test_usn_validator():
     valid, res = validate_usn("1SG24AI001")

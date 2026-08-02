@@ -1,6 +1,6 @@
 from app.models.student import StudentModel
 from app.models.subject import SubjectModel
-from app.database.connection import get_db, is_mongo
+from app.database.connection import get_db
 from app.utils.pdf_generator import generate_pdf_report
 
 class ReportService:
@@ -20,13 +20,7 @@ class ReportService:
         
         for sub in subjects_db:
             sid = sub['id']
-            if is_mongo(db):
-                mark = db.student_marks.find_one({'student_usn': usn, 'subject_id': int(sid)})
-            else:
-                mark = db.execute(
-                    "SELECT * FROM student_marks WHERE student_usn=? AND subject_id=?",
-                    (usn, sid)
-                ).fetchone()
+            mark = db.marks.find_one({'student_usn': usn, 'subject_id': int(sid)})
                 
             score = mark['score'] if mark else 0
             grand_total += score

@@ -1,11 +1,11 @@
 import io
 import pandas as pd
-from app.database import get_db
+from app.models.subject import SubjectModel
+from app.models.student import StudentModel
 
 def generate_csv_template():
     """Generate sample CSV template file for bulk student marks upload."""
-    conn = get_db()
-    subjects = conn.execute("SELECT id, name FROM subjects ORDER BY display_order, id").fetchall()
+    subjects = SubjectModel.get_all()
     
     headers = ['USN', 'Name', 'Semester', 'Year', 'Department', 'Email']
     for sub in subjects:
@@ -22,9 +22,8 @@ def generate_csv_template():
     return output
 
 def process_bulk_upload(file_stream, file_filename):
-    """Process uploaded CSV or Excel file and import students & marks."""
-    conn = get_db()
-    subjects = conn.execute("SELECT id, name FROM subjects ORDER BY display_order, id").fetchall()
+    """Process uploaded CSV or Excel file and import students & marks into MongoDB."""
+    subjects = SubjectModel.get_all()
     
     try:
         if file_filename.endswith('.csv'):
@@ -53,19 +52,10 @@ def process_bulk_upload(file_stream, file_filename):
         dept = str(row.get('Department', 'AI & Data Science')).strip()
         email = str(row.get('Email', '-')).strip()
 
-        # Insert or update student
-        conn.execute("""
-            INSERT INTO students (usn, name, semester, year, department, email)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON CONFLICT(usn) DO UPDATE SET
-                name=excluded.name,
-                semester=excluded.semester,
-                year=excluded.year,
-                department=excluded.department,
-                email=excluded.email
-        """, (usn, name, sem, year, dept, email))
+        # Save student document in 'students' collection
+        StudentModel.save_student(usn, name, sem, year, dept, email)
 
-        # Insert or update marks for subjects
+        # Save marks documents in 'marks' collection
         for sub in subjects:
             sid = sub['id']
             s_name = sub['name']
@@ -83,16 +73,8 @@ def process_bulk_upload(file_stream, file_filename):
             att = str(row.get(att_col, '-')).strip() if att_col in df.columns else '-'
             rem = str(row.get(rem_col, '-')).strip() if rem_col in df.columns else '-'
 
-            conn.execute("""
-                INSERT INTO student_marks (student_usn, subject_id, score, attendance, remark)
-                VALUES (?, ?, ?, ?, ?)
-                ON CONFLICT(student_usn, subject_id) DO UPDATE SET
-                    score=excluded.score,
-                    attendance=excluded.attendance,
-                    remark=excluded.remark
-            """, (usn, sid, score, att, rem))
+            StudentModel.save_mark(usn, sid, score, att, rem)
 
         imported_count += 1
 
-    conn.commit()
     return True, imported_count, None
